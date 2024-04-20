@@ -22,6 +22,7 @@ const config = {
         color: {
           "p":"var(--color-1)",
           "a":"var(--color-2)",
+          "c":"var(--color-4)",
           "b":"var(--color-3)",
         },
         border: "hsl(var(--border))",
