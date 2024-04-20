@@ -21,7 +21,9 @@ const buttonVariants = cva(
         myvar_1: "hover:bg-[#fef1f5] hover:text-accent-foreground",
         myvar_2:
           "bg-[#fef1f5] text-secondary-foreground hover:bg-[#fef1f5]/80",
-      },
+        myvar_3:
+          "bg-color-p text-primary-foreground hover:bg-[#7230fe]/80",
+        },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",

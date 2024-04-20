@@ -13,7 +13,7 @@ type Props = {};
 const NavBar = (props: Props) => {
   const { organization } = useOrganization();
   return (
-    <div className="bg-color-a items-center w-full flex gap-x-4 p-5">
+    <div className="bg-color-a items-center w-full h-[80px] flex gap-x-4 p-5">
       <div className="hidden lg:flex lg:flex-1">
         <SearchInput />
       </div>
