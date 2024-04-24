@@ -3,28 +3,37 @@ import { logo2 } from "../../../../public/svgExport";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CreateOrganization } from "@clerk/nextjs";
-type Props = {};
+import { cn } from "@/lib/utils";
+type Props = {
+  heading: string;
+  label: string;
+  image: string;
+  buttonLabel? : string;
+  size? : "sm"|"md"|"lg";
+};
+const EmptyPage = ({
+  heading,label,image,buttonLabel,size
+}: Props) => {
 
-const EmptyPage = (props: Props) => {
   return (
-    <div className="h-full grid place-content-center text-center">
-      <Image src={logo2} alt="Logo" height={400} width={400} />
-      <h1 className="text-[3rem] leading-[3.2rem] font-semibold mt-6">
-        Welcome to Synkboard
+    <div className="h-full flex flex-col items-center justify-center text-center">
+      <Image src={image} alt="Image" height={400} width={400} className={cn({"h-[300px] w-[300px]":size==="sm"})}/>
+      <h1 className="text-4xl font-semibold mt-6">
+        {heading}
       </h1>
-      <p className="text-muted-foreground text-3xl mt-4">
-        Create an organization to get started
+      <p className="text-muted-foreground text-2xl font-semibold mt-4">
+        {label}
       </p>
-      <Dialog>
+      {buttonLabel?<Dialog>
         <DialogTrigger asChild>
           <Button variant={"myvar_3"} size={"xl"} className="mt-10 text-lg">
-            Add Organisation
+            {buttonLabel}
           </Button>
         </DialogTrigger>
-        <DialogContent className='border-none p-0 bg-transparent'>
+        <DialogContent className='border-none p-0 bg-transparent max-w-[480px]'>
           <CreateOrganization />
         </DialogContent>
-      </Dialog>
+      </Dialog>:null}
     </div>
   );
 };
