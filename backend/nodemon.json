@@ -1,5 +1,0 @@
-{
-    "watch": [ "./" ],
-    "ext": "ts",
-    "exec": "kill -9 $(lsof -i:3001 -t) & ts-node ./src/index.ts"
-  }
