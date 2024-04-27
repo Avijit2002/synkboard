@@ -1,24 +1,40 @@
-import express, { ErrorRequestHandler } from "express"
+import { ErrorRequestHandler } from "express"
+import { createServer } from "./server"
 import rootRouter from "./routes/index"
+import { ApiError } from "./utils/apiError";
+import { asyncFunction } from "./utils/asyncHandler";
+import { errorHandler } from "./utils/defaultErrorHandler";
+import 'dotenv/config'
 
-const app = express()
+import {
+    ClerkExpressWithAuth,
+    LooseAuthProp,
+    WithAuthProp,
+  } from '@clerk/clerk-sdk-node';
 
-app.use(express.json())
 
+declare global {
+    namespace Express {
+      interface Request extends LooseAuthProp {}
+    }
+  }
 
-app.get('/',(req,res)=>{
-    throw new Error("Error Testing 123")
-    res.send("hello from synkboard backend!")
-}) 
+const port = process.env.PORT || 3001;
 
-app.use('/api/v1',rootRouter)
+const app = createServer()
 
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    console.log(err.message)
-    res.status(500).json({
-        message: err.message? err.message:"Internal Server Error!"
-    })
-};
+app.get('/',ClerkExpressWithAuth(), asyncFunction(async (req, res, next) => {
+       const userId = req.auth.userId
+       if(!userId){
+        throw new ApiError(402,"Not allowed!")
+       }
+    //res.send("hello from synkboard backend!")
+}))
+
+app.use('/api/v1', rootRouter)
+
 app.use(errorHandler);
 
-app.listen(3005)
+app.listen(port, () => {
+    console.log(`Server running on port: ${port}`)
+})

@@ -1,0 +1,27 @@
+{
+  "name": "@repo/database",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:generate:dev":"prisma db generate",
+    "db:push": "prisma db push"
+  },
+  "exports":{
+    "./db":"./src/client.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "5.13.0",
+    "prisma": "^5.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7"
+  }
+}
