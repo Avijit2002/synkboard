@@ -18,7 +18,6 @@ model boards {
   title      String
   orgId      String
   authorId   String
-  authorName String
   imageUrl   String
 
   createdAt DateTime @default(now())
