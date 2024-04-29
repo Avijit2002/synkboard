@@ -11,29 +11,45 @@ import { Label } from "@/components/ui/label";
 import { useAuth, useOrganization } from "@clerk/nextjs";
 import { useMutation } from "@tanstack/react-query";
 import { createBoard } from "@/api/dashboard";
+import { useState } from "react";
+import { createBoardSchema, type typeCreateBoardSchema } from "@repo/common";
 
-type Props = {};
-
-const CreateBoard = (props: Props) => {
+const CreateBoard = () => {
   const { organization } = useOrganization();
   const { getToken } = useAuth();
 
-  const { mutate,data, error, isError, isSuccess, isPending } = useMutation({
-    mutationFn: (token: string) =>
-      createBoard(token, {
-        title: "hii",
-        orgId: organization?.id!,
-      }),
-  });
+  const [boardTitle, setBoardTitle] = useState<string>("");
+
+  const { mutate, data, error, isError, isSuccess, isPending } = useMutation({
+    mutationFn: ({token,data}:{token:string,data:typeCreateBoardSchema}) => {
+      return createBoard(token, data);
+    },
+    //onSuccess:  TODO: Refetch data by invalidating the cache // Display Toast
+    //onError: TODO: Handle error here
+    // TODO: refactor handlesubmit fun
+   });
 
   const handleSubmit = async () => {
     const token = await getToken();
-    mutate("token"!);
-    if(isError){
-        console.log(error.message)
+    if(!token) return;
+
+    const data: typeCreateBoardSchema = {
+      title: boardTitle,
+      orgId: organization?.id!,
+    };
+
+    const validate = createBoardSchema.safeParse(data);
+    if (!validate.success) {
+      // TODO Display Error in UI
+      return;
     }
-    if(isSuccess){
-        console.log(data?.data.success)
+
+    mutate({token,data});
+    if (isError) {
+      console.log(error.message);
+    }
+    if (isSuccess) {
+      console.log(data);
     }
   };
 
@@ -50,7 +66,13 @@ const CreateBoard = (props: Props) => {
           <Label htmlFor="name" className="text-right text-lg">
             Title
           </Label>
-          <Input id="name" defaultValue="Board-1" className="col-span-3" />
+          <Input
+            id="name"
+            defaultValue="Board-1"
+            className="col-span-3"
+            value={boardTitle}
+            onChange={(e) => setBoardTitle(e.target.value)}
+          />
         </div>
       </div>
       <DialogFooter>
