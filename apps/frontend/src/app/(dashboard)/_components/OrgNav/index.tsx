@@ -37,6 +37,7 @@ const OrgNav = (props: Props) => {
               width: "100%",
             },
             organizationSwitcherTrigger: {
+              height: "3.5rem",
               padding: "6px",
               width: "100%",
               borderRadius: "8px",

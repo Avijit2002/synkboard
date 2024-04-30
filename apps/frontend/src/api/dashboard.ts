@@ -15,6 +15,7 @@ export const createBoard = async (token: any,data:any) => {
             },
             data: data
         })
+        //console.log(response.data)
         return response
     } catch (error) {
         if(error instanceof AxiosError){

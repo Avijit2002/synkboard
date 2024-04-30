@@ -21,37 +21,30 @@ const CreateBoard = () => {
   const [boardTitle, setBoardTitle] = useState<string>("");
 
   const { mutate, data, error, isError, isSuccess, isPending } = useMutation({
-    mutationFn: ({token,data}:{token:string,data:typeCreateBoardSchema}) => {
-      return createBoard(token, data);
+    mutationFn: async (boardTitle: string) => {
+      const token = await getToken();
+      if (!token) throw new Error("No token!");
+      if (!organization) throw new Error("No organization selected!");
+
+      const reqData: typeCreateBoardSchema = {
+        title: boardTitle,
+        orgId: organization?.id!,
+      };
+
+      const validate = createBoardSchema.safeParse(reqData);
+      if (!validate.success) {
+        // TODO Display Error in UI
+        throw new Error(validate.error.format().title?._errors[0] as string); // TODO Display errors for all fields
+      }
+      return createBoard(token, reqData);
     },
-    //onSuccess:  TODO: Refetch data by invalidating the cache // Display Toast
-    //onError: TODO: Handle error here
-    // TODO: refactor handlesubmit fun
-   });
-
-  const handleSubmit = async () => {
-    const token = await getToken();
-    if(!token) return;
-
-    const data: typeCreateBoardSchema = {
-      title: boardTitle,
-      orgId: organization?.id!,
-    };
-
-    const validate = createBoardSchema.safeParse(data);
-    if (!validate.success) {
-      // TODO Display Error in UI
-      return;
-    }
-
-    mutate({token,data});
-    if (isError) {
-      console.log(error.message);
-    }
-    if (isSuccess) {
-      console.log(data);
-    }
-  };
+    onSuccess: (data) => {
+      console.log(data?.data); // Add Toast here
+    },
+    onError: (error) => {
+      console.log(error.message); // Add Toast here
+    },
+  });
 
   return (
     <DialogContent>
@@ -76,7 +69,11 @@ const CreateBoard = () => {
         </div>
       </div>
       <DialogFooter>
-        <Button type="submit" disabled={isPending} onClick={handleSubmit}>
+        <Button
+          type="submit"
+          disabled={isPending}
+          onClick={() => mutate(boardTitle)}
+        >
           Create
         </Button>
       </DialogFooter>

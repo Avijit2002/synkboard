@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import ReactQueryClientProvider from "@/components/ReactQueryClientProvider";
-
-const inter = Inter({ subsets: ["latin"] });
+import { Poppins } from 'next/font/google'
+ 
+const poppins = Poppins({
+  weight: '400',
+  subsets: ['latin'],
+})
 
 export const metadata: Metadata = {
   title: "Synkboard",
@@ -23,7 +26,7 @@ export default function RootLayout({
         href="/synkboard-favicon-color.png"
         type="image/x-icon"
       />
-      <body className={inter.className}>
+      <body className={poppins.className}>
         <ClerkProvider>
           <ReactQueryClientProvider>
             {children}
