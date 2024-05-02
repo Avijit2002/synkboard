@@ -9,11 +9,6 @@ import { Button } from "@/components/ui/button";
 import { LayoutDashboard, Star } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
-const font = Poppins({
-  subsets: ["latin"],
-  weight: ["600"],
-});
-
 type Props = {};
 
 const OrgNav = (props: Props) => {

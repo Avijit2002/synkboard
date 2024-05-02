@@ -8,25 +8,32 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth, useOrganization } from "@clerk/nextjs";
-import { useMutation } from "@tanstack/react-query";
+import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createBoard } from "@/api/dashboard";
 import { useState } from "react";
 import { createBoardSchema, type typeCreateBoardSchema } from "@repo/common";
+import { toast } from "sonner"
+
 
 const CreateBoard = () => {
+  
   const { organization } = useOrganization();
   const { getToken } = useAuth();
+  const {user} = useUser()
 
   const [boardTitle, setBoardTitle] = useState<string>("");
+
+  const queryClient = useQueryClient()
 
   const { mutate, data, error, isError, isSuccess, isPending } = useMutation({
     mutationFn: async (boardTitle: string) => {
       const token = await getToken();
       if (!token) throw new Error("No token!");
-      if (!organization) throw new Error("No organization selected!");
+      if (!organization) throw new Error("No organization selected!");  // All this errors are handled in onError callback function
 
       const reqData: typeCreateBoardSchema = {
+        userName: user?.username as string,
         title: boardTitle,
         orgId: organization?.id!,
       };
@@ -36,13 +43,18 @@ const CreateBoard = () => {
         // TODO Display Error in UI
         throw new Error(validate.error.format().title?._errors[0] as string); // TODO Display errors for all fields
       }
-      return createBoard(token, reqData);
+      return createBoard(token, reqData);   // createBoard returns the response object of http response and it will be available as data returned from useMutation
     },
     onSuccess: (data) => {
-      console.log(data?.data); // Add Toast here
+      queryClient.invalidateQueries({
+        queryKey: ["boards",organization?.id]  // Whenever new board is added old cache will be invalid and fetch occurs
+      })
+      console.log(data?.data); 
+      toast.success("Board created successfully!")
     },
     onError: (error) => {
-      console.log(error.message); // Add Toast here
+      console.log(error.message); 
+      toast.error(error.message)
     },
   });
 

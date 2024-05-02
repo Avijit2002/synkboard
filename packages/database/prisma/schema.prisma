@@ -15,6 +15,7 @@ datasource db {
 
 model boards {
   id         String @id @default(cuid())
+  userName   String
   title      String
   orgId      String
   authorId   String

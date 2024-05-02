@@ -17,7 +17,9 @@ const images = [
     "/placeholder/5.svg",
 ]
 
-router.post('/create', ClerkExpressWithAuth(), asyncFunction(async (req, res) => {
+router.use(ClerkExpressWithAuth())
+
+router.post('/create', asyncFunction(async (req, res) => {
     if (!req.auth.userId) {
         throw new ApiError(responseStatus.unauthorized, "Unauthorized!")
     }
@@ -44,9 +46,38 @@ router.post('/create', ClerkExpressWithAuth(), asyncFunction(async (req, res) =>
 
     res.status(responseStatus.success).json({
         success: true,
-        message: {
+        message: "Board created successfully!",
+        data: {
             boardId: board.id
         }
+    })
+
+}))
+
+router.get('/read/:orgId', asyncFunction(async (req,res)=>{
+
+    if (!req.auth.userId) {
+        throw new ApiError(responseStatus.unauthorized, "Unauthorized!")
+    }
+
+    const orgId = req.params.orgId;
+    console.log(orgId)
+    if(req.auth.orgId !== orgId) throw new ApiError(responseStatus.unauthorized, "Unauthorized!")
+
+
+    const boards = await prisma.boards.findMany({
+        where: {
+            orgId: orgId
+        },
+    })
+
+    if (!boards) {
+        throw new ApiError(responseStatus.serviceUnavailable, "DB Down, Try again later!")
+    }
+
+    res.status(responseStatus.success).json({
+        success: true,
+        data: boards,
     })
 
 }))

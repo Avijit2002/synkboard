@@ -7,7 +7,12 @@ import {
 } from "../../../../public/svgExport";
 import EmptyPage from "./EmptyPage";
 import CreateBoard from "./CreateBoard";
-
+import { useQuery } from "@tanstack/react-query";
+import { getBoards } from "@/api/dashboard";
+import { useAuth, useOrganization } from "@clerk/nextjs";
+import { Plus } from "lucide-react";
+import BoardCard from "./board-cards/card";
+import { typeBoard } from "@repo/common";
 
 type Props = {
   orgId: string;
@@ -18,9 +23,26 @@ type Props = {
 };
 
 const BoardList = ({ orgId, query }: Props) => {
-  const data = []; // TODO : API Call
+  const { organization } = useOrganization();
+  const { getToken } = useAuth();
 
-  if (!data.length && query.search) {
+  const { data } = useQuery({
+    queryKey: ["boards", organization?.id], // Each query cache is uniquely identified so storing boards data of different orgs in different cache.
+    queryFn: async () => {
+      const token = await getToken();
+
+      if (!token) throw new Error("No token!");
+      if (!organization) throw new Error("No organization selected!");
+
+      return getBoards(token, organization.id);
+    },
+  });
+
+  const boards: typeBoard[] = data?.data?.data;
+  console.log(boards)
+
+  if (!boards && query.search) {
+    // TODO: This don't work now because search api call nt implemented yet
     return (
       <EmptyPage
         image={noResult}
@@ -31,7 +53,7 @@ const BoardList = ({ orgId, query }: Props) => {
     );
   }
 
-  if (!data.length && query.favorites) {
+  if (!boards && query.favorites) {
     return (
       <EmptyPage
         image={noFavourite}
@@ -42,7 +64,7 @@ const BoardList = ({ orgId, query }: Props) => {
     );
   }
 
-  if (!data.length) {
+  if (!boards?.length) {
     return (
       <EmptyPage
         image={createBoard}
@@ -55,7 +77,18 @@ const BoardList = ({ orgId, query }: Props) => {
     );
   }
 
-  return <div>{JSON.stringify(query)}</div>;
+  return (
+    <div>
+      <h2 className="text-3xl">
+        {query.favorites ? "Favorite Boards" : "Team Boards"}
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 mt-4 gap-8 pb-10 justify-items-center">
+        {boards?.map((board: typeBoard) => (
+         <BoardCard key={board.id} board={board} />
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default BoardList;

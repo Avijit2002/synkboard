@@ -24,7 +24,7 @@ const Dashboard = ({ searchParams }: Props) => {
   //const { getToken } = useAuth();
 
   return (
-    <div className="flex-1 bg-color-background h-[calc(100%-80px)] p-6">
+    <div className="flex-1 bg-color-background h-[calc(100%-80px)] p-6  overflow-y-scroll">
       {!organization ? (
         <EmptyPage
           image={logo2}

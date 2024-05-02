@@ -3,10 +3,11 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import ReactQueryClientProvider from "@/components/ReactQueryClientProvider";
 import { Poppins } from 'next/font/google'
+import { Toaster } from "@/components/ui/sonner"
  
 const poppins = Poppins({
-  weight: '400',
-  subsets: ['latin'],
+  subsets: ["latin"],
+  weight: ["400"],
 })
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default function RootLayout({
             {children}
           </ReactQueryClientProvider>
         </ClerkProvider>
+        <Toaster />
       </body>
     </html>
   );
