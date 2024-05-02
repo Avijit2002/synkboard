@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import ReactQueryClientProvider from "@/components/ReactQueryClientProvider";
-import { Poppins } from 'next/font/google'
-import { Toaster } from "@/components/ui/sonner"
- 
+import { Poppins } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400"],
-})
+});
 
 export const metadata: Metadata = {
   title: "Synkboard",
@@ -29,11 +29,18 @@ export default function RootLayout({
       />
       <body className={poppins.className}>
         <ClerkProvider>
-          <ReactQueryClientProvider>
-            {children}
-          </ReactQueryClientProvider>
+          <ReactQueryClientProvider>{children}</ReactQueryClientProvider>
         </ClerkProvider>
-        <Toaster />
+        <Toaster
+          position="top-center"
+          richColors
+          toastOptions={{
+            classNames: {
+              title: "text-lg",
+              
+            },
+          }}
+        />
       </body>
     </html>
   );

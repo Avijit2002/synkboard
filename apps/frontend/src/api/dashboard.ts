@@ -31,7 +31,7 @@ export const getBoards = async (token: string,orgId:string) => {
     try {
         const response = await axios({
             method: 'get',
-            url: `/api/v1/board/read/${orgId}`,
+            url: `/api/v1/board/boardList/${orgId}`,
             baseURL: backend_url,
             headers: {
                 Authorization: `Bearer ${token}`

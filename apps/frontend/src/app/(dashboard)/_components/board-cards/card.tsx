@@ -16,7 +16,7 @@ const BoardCard = ({ board }: { board: typeBoard }) => {
   });
 
   return (
-    <Link href={`/board/${board.id}`} className="h-[22rem] w-full">
+    <Link href={`/board/${board.id}`} className="h-[22rem] w-full max-w-[18rem]">
       <div className="group rounded-lg border flex flex-col h-full w-full justify-center"> 
       {/* group is used to change style of any other element if some event occurs here  */}
         <div className="relative bg-blue-100 flex-1 rounded-t-lg">

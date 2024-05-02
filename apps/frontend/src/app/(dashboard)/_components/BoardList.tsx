@@ -13,6 +13,7 @@ import { useAuth, useOrganization } from "@clerk/nextjs";
 import { Plus } from "lucide-react";
 import BoardCard from "./board-cards/card";
 import { typeBoard } from "@repo/common";
+import { Dialog, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 
 type Props = {
   orgId: string;
@@ -39,7 +40,7 @@ const BoardList = ({ orgId, query }: Props) => {
   });
 
   const boards: typeBoard[] = data?.data?.data;
-  console.log(boards)
+  console.log(boards);
 
   if (!boards && query.search) {
     // TODO: This don't work now because search api call nt implemented yet
@@ -82,9 +83,17 @@ const BoardList = ({ orgId, query }: Props) => {
       <h2 className="text-3xl">
         {query.favorites ? "Favorite Boards" : "Team Boards"}
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 mt-4 gap-8 pb-10 justify-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 3xl:grid-cols-5  mt-6 gap-8 pb-10 justify-items-center">
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="cursor-pointer bg-[#7230fe]/80 hover:bg-[#7230fe]/60 transition-colors rounded-lg border flex flex-col h-[22rem] max-w-[18rem] w-full justify-center items-center">
+              <Plus className="text-white/80" size={"2.5rem"}/>
+            </div>
+          </DialogTrigger>
+          <CreateBoard />
+        </Dialog>
         {boards?.map((board: typeBoard) => (
-         <BoardCard key={board.id} board={board} />
+          <BoardCard key={board.id} board={board} />
         ))}
       </div>
     </div>

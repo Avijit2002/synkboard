@@ -33,7 +33,7 @@ router.post('/create', asyncFunction(async (req, res) => {
         // TODO : also send error object with error descriptions, parse zod error
     }
     const randomImage = images[Math.floor(Math.random() * images.length)] as string
-    const data = { ...validated.data, imageUrl: randomImage, authorId: req.auth.userId}
+    const data = { ...validated.data, imageUrl: randomImage, authorId: req.auth.userId }
 
 
     const board = await prisma.boards.create({
@@ -54,7 +54,7 @@ router.post('/create', asyncFunction(async (req, res) => {
 
 }))
 
-router.get('/read/:orgId', asyncFunction(async (req,res)=>{
+router.get('/boardList/:orgId', asyncFunction(async (req, res) => {
 
     if (!req.auth.userId) {
         throw new ApiError(responseStatus.unauthorized, "Unauthorized!")
@@ -62,14 +62,14 @@ router.get('/read/:orgId', asyncFunction(async (req,res)=>{
 
     const orgId = req.params.orgId;
     console.log(orgId)
-    if(req.auth.orgId !== orgId) throw new ApiError(responseStatus.unauthorized, "Unauthorized!")
+    if (req.auth.orgId !== orgId) throw new ApiError(responseStatus.unauthorized, "Unauthorized!")
 
 
     const boards = await prisma.boards.findMany({
         where: {
             orgId: orgId
         },
-    })
+    }) 
 
     if (!boards) {
         throw new ApiError(responseStatus.serviceUnavailable, "DB Down, Try again later!")
@@ -78,7 +78,7 @@ router.get('/read/:orgId', asyncFunction(async (req,res)=>{
     res.status(responseStatus.success).json({
         success: true,
         data: boards,
-    })
+    }) 
 
 }))
 
