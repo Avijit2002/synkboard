@@ -26,12 +26,12 @@ export const createBoard = async (token: string,data:typeCreateBoardSchema) => {
     } 
 }
 
-export const getBoards = async (token: string,orgId:string) => {
+export const getBoards = async (token: string,orgId:string, query?: string) => {
     console.log(orgId)
     try {
         const response = await axios({
             method: 'get',
-            url: `/api/v1/board/boardList/${orgId}`,
+            url: `/api/v1/board/boardList?orgId=${orgId}&filter=${query}`,
             baseURL: backend_url,
             headers: {
                 Authorization: `Bearer ${token}`

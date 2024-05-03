@@ -15,6 +15,7 @@ import BoardCard from "./board-cards/card";
 import { typeBoard } from "@repo/common";
 import { Dialog, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 
+
 type Props = {
   orgId: string;
   query: {
@@ -24,25 +25,24 @@ type Props = {
 };
 
 const BoardList = ({ orgId, query }: Props) => {
-  const { organization } = useOrganization();
   const { getToken } = useAuth();
 
   const { data } = useQuery({
-    queryKey: ["boards", organization?.id], // Each query cache is uniquely identified so storing boards data of different orgs in different cache.
+    queryKey: ["boards", orgId, query.search], // Each query cache is uniquely identified so storing boards data of different orgs in different cache.
     queryFn: async () => {
       const token = await getToken();
 
       if (!token) throw new Error("No token!");
-      if (!organization) throw new Error("No organization selected!");
+      if (!orgId) throw new Error("No organization selected!");
 
-      return getBoards(token, organization.id);
+      return getBoards(token, orgId,query.search);
     },
   });
 
   const boards: typeBoard[] = data?.data?.data;
   console.log(boards);
 
-  if (!boards && query.search) {
+  if (!boards?.length && query.search) {
     // TODO: This don't work now because search api call nt implemented yet
     return (
       <EmptyPage
@@ -87,7 +87,7 @@ const BoardList = ({ orgId, query }: Props) => {
         <Dialog>
           <DialogTrigger asChild>
             <div className="cursor-pointer bg-[#7230fe]/80 hover:bg-[#7230fe]/60 transition-colors rounded-lg border flex flex-col h-[22rem] max-w-[18rem] w-full justify-center items-center">
-              <Plus className="text-white/80" size={"2.5rem"}/>
+              <Plus className="text-white/80" size={"2.5rem"} />
             </div>
           </DialogTrigger>
           <CreateBoard />

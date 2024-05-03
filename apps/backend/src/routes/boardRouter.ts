@@ -54,22 +54,35 @@ router.post('/create', asyncFunction(async (req, res) => {
 
 }))
 
-router.get('/boardList/:orgId', asyncFunction(async (req, res) => {
+router.get('/boardList', asyncFunction(async (req, res) => {
 
     if (!req.auth.userId) {
         throw new ApiError(responseStatus.unauthorized, "Unauthorized!")
     }
 
-    const orgId = req.params.orgId;
-    console.log(orgId)
+    const orgId = req.query.orgId;
+    const filter = req.query.filter;
+    console.log(filter)
     if (req.auth.orgId !== orgId) throw new ApiError(responseStatus.unauthorized, "Unauthorized!")
 
 
-    const boards = await prisma.boards.findMany({
+    let boards;
+
+     boards = filter === "undefined"? await prisma.boards.findMany({
         where: {
-            orgId: orgId
+            orgId: orgId,
         },
-    }) 
+    }): await prisma.boards.findMany({
+        where: {
+            orgId: orgId,
+            title: {
+                startsWith: filter as string
+            }
+        },
+    })
+
+
+
 
     if (!boards) {
         throw new ApiError(responseStatus.serviceUnavailable, "DB Down, Try again later!")
@@ -78,7 +91,7 @@ router.get('/boardList/:orgId', asyncFunction(async (req, res) => {
     res.status(responseStatus.success).json({
         success: true,
         data: boards,
-    }) 
+    })
 
 }))
 
