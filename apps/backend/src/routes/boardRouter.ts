@@ -62,21 +62,22 @@ router.get('/boardList', asyncFunction(async (req, res) => {
 
     const orgId = req.query.orgId;
     const filter = req.query.filter;
-    console.log(filter)
+    //console.log(filter)
     if (req.auth.orgId !== orgId) throw new ApiError(responseStatus.unauthorized, "Unauthorized!")
 
 
     let boards;
 
-     boards = filter === "undefined"? await prisma.boards.findMany({
+    boards = filter === "undefined" ? await prisma.boards.findMany({  // In server type undefined is received as string
         where: {
             orgId: orgId,
         },
-    }): await prisma.boards.findMany({
+    }) : await prisma.boards.findMany({
         where: {
             orgId: orgId,
             title: {
-                startsWith: filter as string
+                startsWith: filter as string,
+                mode: 'insensitive'
             }
         },
     })

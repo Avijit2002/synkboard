@@ -11,7 +11,7 @@ type Props = {};
 
 const SearchInput = (props: Props) => {
   const router = useRouter();
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState("");  // Here using ' ' instead of '' because for no query I need empty string, if I use '' then empty string will be undefined and it will reach backend as "undefined" string not empty string
   const [debouncedValue, setDebouncedValue] = useDebounceValue(value, 500);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {

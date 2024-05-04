@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import ReactQueryClientProvider from "@/components/ReactQueryClientProvider";
 import { Poppins } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import Loader from "@/components/ui/Loader";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -27,9 +28,14 @@ export default function RootLayout({
         href="/synkboard-favicon-color.png"
         type="image/x-icon"
       />
-      <body className={poppins.className}>
+      <body className={`${poppins.className} w-screen h-screen`}>
         <ClerkProvider>
-          <ReactQueryClientProvider>{children}</ReactQueryClientProvider>
+          <ClerkLoading>
+            <Loader />
+          </ClerkLoading>
+          <ClerkLoaded>
+            <ReactQueryClientProvider>{children}</ReactQueryClientProvider>
+          </ClerkLoaded>
         </ClerkProvider>
         <Toaster
           position="top-center"
@@ -37,7 +43,6 @@ export default function RootLayout({
           toastOptions={{
             classNames: {
               title: "text-lg",
-              
             },
           }}
         />

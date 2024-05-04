@@ -2,10 +2,10 @@
 import { typeCreateBoardSchema } from "@repo/common"
 import axios, { AxiosError } from "axios"
 
-const backend_url = "http://localhost:3001"
-console.log(backend_url)
+const backend_url = process.env.BACKEND_URL
+//console.log(process.env)
 
-export const createBoard = async (token: string,data:typeCreateBoardSchema) => {
+export const createBoard = async (token: string, data: typeCreateBoardSchema) => {
     //console.log(data)
     try {
         const response = await axios({
@@ -20,14 +20,15 @@ export const createBoard = async (token: string,data:typeCreateBoardSchema) => {
         //console.log(response.data)
         return response
     } catch (error) {
-        if(error instanceof AxiosError){
+        if (error instanceof AxiosError) {
             throw new Error(error.response?.data.message)
         }
-    } 
+    }
 }
 
-export const getBoards = async (token: string,orgId:string, query?: string) => {
-    console.log(orgId)
+export const getBoards = async (token: string, orgId: string, query?: string ) => {
+    //console.log(orgId)
+    console.log(typeof(query))
     try {
         const response = await axios({
             method: 'get',
@@ -40,8 +41,8 @@ export const getBoards = async (token: string,orgId:string, query?: string) => {
         //console.log(response.data)
         return response
     } catch (error) {
-        if(error instanceof AxiosError){
+        if (error instanceof AxiosError) {
             throw new Error(error.response?.data.message)
         }
-    } 
+    }
 }

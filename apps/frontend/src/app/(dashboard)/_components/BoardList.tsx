@@ -14,7 +14,7 @@ import { Plus } from "lucide-react";
 import BoardCard from "./board-cards/card";
 import { typeBoard } from "@repo/common";
 import { Dialog, DialogClose, DialogTrigger } from "@/components/ui/dialog";
-
+import Loader from "@/components/ui/Loader";
 
 type Props = {
   orgId: string;
@@ -27,7 +27,7 @@ type Props = {
 const BoardList = ({ orgId, query }: Props) => {
   const { getToken } = useAuth();
 
-  const { data } = useQuery({
+  const { data ,isLoading} = useQuery({
     queryKey: ["boards", orgId, query.search], // Each query cache is uniquely identified so storing boards data of different orgs in different cache.
     queryFn: async () => {
       const token = await getToken();
@@ -35,12 +35,16 @@ const BoardList = ({ orgId, query }: Props) => {
       if (!token) throw new Error("No token!");
       if (!orgId) throw new Error("No organization selected!");
 
-      return getBoards(token, orgId,query.search);
+      return getBoards(token, orgId,query.search );
     },
   });
 
   const boards: typeBoard[] = data?.data?.data;
   console.log(boards);
+
+  if(isLoading){
+    return <Loader />
+  }
 
   if (!boards?.length && query.search) {
     // TODO: This don't work now because search api call nt implemented yet
