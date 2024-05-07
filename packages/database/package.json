@@ -12,7 +12,8 @@
     "db:push": "prisma db push"
   },
   "exports":{
-    "./db":"./src/client.ts"
+    "./db":"./src/client.ts",
+    "./types":"./src/types.ts"
   },
   "keywords": [],
   "author": "",
