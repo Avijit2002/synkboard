@@ -1,4 +1,4 @@
-import { ErrorRequestHandler } from "express"
+
 import { createServer } from "./server"
 import rootRouter from "./routes/index"
 import { ApiError } from "./utils/apiError";

@@ -1,10 +1,22 @@
 "use Client";
-type Props = {}
 
-const Canvas = (props: Props) => {
+import Info from "./Info";
+import Participants from "./Participants";
+import Toolbar from "./Toolbar";
+
+type Props = {
+  boardId: string
+};
+
+const Canvas = ({boardId}: Props) => {
   return (
-    <main className="h-full w-full relative bg-neutral-100 touch-none">Canvas</main>
-  )
-}
+    <main className="h-full w-full relative bg-neutral-100 touch-none">
+      <Info />
+      <Participants />
+      <Toolbar />
 
-export default Canvas
+    </main>
+  );
+};
+
+export default Canvas;

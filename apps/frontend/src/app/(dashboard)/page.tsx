@@ -1,13 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
 import { logo2 } from "../../../public/svgExport";
 import BoardList from "./_components/BoardList";
 import EmptyPage from "./_components/EmptyPage";
 import {
   CreateOrganization,
-  auth,
-  useAuth,
   useOrganization,
 } from "@clerk/nextjs";
 import { DialogContent } from "@/components/ui/dialog";

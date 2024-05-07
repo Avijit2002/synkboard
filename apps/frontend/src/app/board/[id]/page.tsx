@@ -9,7 +9,7 @@ type Props = {
 
 const Page = ({params}: Props) => {
   return (
-    <Canvas />
+    <Canvas boardId={params.id}/>
   )
 }
 
