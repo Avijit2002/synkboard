@@ -206,6 +206,9 @@ importers:
         specifier: ^8.17.0
         version: 8.17.0
     devDependencies:
+      '@repo/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@types/body-parser':
         specifier: ^1.19.5
         version: 1.19.5
