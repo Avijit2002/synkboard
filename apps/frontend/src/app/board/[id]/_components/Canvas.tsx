@@ -12,15 +12,24 @@ type Props = {
 
 const Canvas = ({ boardId }: Props) => {
   const [ws, setWS] = useState<null | WebSocket>(null);
-  const [isReady, setIsReady] = useState(false);
   const { getToken } = useAuth();
 
   useEffect(() => {
     let socket: WebSocket;
     async function connect() {
       socket = new WebSocket(`ws://localhost:3002`);
+      const token = await getToken()
       socket.onopen = () => {
         console.log("Connected");
+        socket.send(
+          JSON.stringify({
+            type: "authentication",
+            data: {
+              boardId,
+              token,
+            },
+          })
+        );
       };
       socket.onmessage = (event) => console.log(event.data);
       setWS(socket);
@@ -28,24 +37,6 @@ const Canvas = ({ boardId }: Props) => {
     connect();
     //socket.onopen(console.log("hii"))
   }, []);
-
-  useEffect(() => {
-    async function send() {
-      const token = await getToken();
-      if (isReady && ws?.OPEN) {
-        ws?.send(
-          JSON.stringify({
-            type: "authorization",
-            data: {
-              boardId,
-              token,
-            },
-          })
-        );
-      }
-    }
-    send();
-  },[isReady,ws?.readyState]);
 
   return (
     <main className="h-full w-full relative bg-neutral-100 touch-none">

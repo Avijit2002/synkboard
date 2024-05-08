@@ -32,7 +32,7 @@ import { WebSocketWithAuth } from "./types";
 
 
 export async function auth(data: any, ws: WebSocketWithAuth) {
-    //console.log(data)
+    console.log(data)
     const token = data.token
     const boardId = data.boardId
     let decoded: JwtPayload;
@@ -59,6 +59,7 @@ export async function auth(data: any, ws: WebSocketWithAuth) {
             //console.log(orgId?.orgId, decoded.org_id)
 
             if (orgId?.orgId === decoded.org_id) {
+                //console.log("hii")
                 ws.send("Authenticated")
                 return true
             }
