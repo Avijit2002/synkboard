@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+// Express Server
 export const createBoardSchema = z.object({
     userName: z.string().trim().min(1, 'Username is required and cannot be empty'),
     title: z.string().trim().min(1, 'Title is required and cannot be empty'),
@@ -8,6 +9,8 @@ export const createBoardSchema = z.object({
 
 export type typeCreateBoardSchema = z.infer<typeof createBoardSchema>
 
+
+// TODO: can we taken from prisma
 export type typeBoard = {
     authorId: string,
     userName: string,
@@ -18,3 +21,15 @@ export type typeBoard = {
     title: string;
     updatedAt: Date;
   };
+
+// WSS server
+
+export function wssMessage(type: string, data: any){
+    return JSON.stringify({
+        type, data
+    })
+}
+
+export enum wssMessageType{
+    authentication = "authentication"
+}

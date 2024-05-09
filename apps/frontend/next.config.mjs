@@ -10,6 +10,7 @@ const nextConfig = {
     },
     env: {
         BACKEND_URL: process.env.BACKEND_URL,
+        WSS_URL: process.env.WSS_URL
       }
 };
 

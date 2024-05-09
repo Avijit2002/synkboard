@@ -28,6 +28,7 @@
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/morgan": "^1.9.9",
-    "@repo/database": "workspace:*"
+    "@repo/database": "workspace:*",
+    "@repo/common": "workspace:*"
   }
 }
