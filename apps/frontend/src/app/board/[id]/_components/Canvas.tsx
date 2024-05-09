@@ -6,7 +6,7 @@ import Toolbar from "./Toolbar";
 import { useWebSocket } from "../_hooks/useWebSocket";
 import { useEffect, useState } from "react";
 import Loader from "@/components/ui/Loader";
-import { messageHandler } from "../_utils/messageHandler";
+import { useBoard } from "../_context/BoardContext";
 
 type Props = {
   boardId: string;
@@ -14,15 +14,17 @@ type Props = {
 
 const Canvas = ({ boardId }: Props) => {
   const { ws } = useWebSocket(boardId);
+  const {wssMessageHandler} = useBoard()!
 
   const [activeUser, setActiveUser] = useState<string[]>()
 
   useEffect(() => {
     if (ws) ws.onmessage = (event) => {
       // always parse the data before passing to any function
-      const payload = JSON.parse(event.data)
-      console.log(payload)
-      messageHandler(payload)
+      const message = JSON.parse(event.data)
+      console.log(message)
+      wssMessageHandler(message)
+    
     }
 
 

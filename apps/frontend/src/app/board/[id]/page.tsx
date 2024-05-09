@@ -1,16 +1,19 @@
-import React from 'react'
-import Canvas from './_components/Canvas'
+import React from "react";
+import Canvas from "./_components/Canvas";
+import { BoardProvider } from "./_context/BoardContext";
 
 type Props = {
-    params:{
-        id: string
-    }
-}
+  params: {
+    id: string;
+  };
+};
 
-const Page = ({params}: Props) => {
+const Page = ({ params }: Props) => {
   return (
-    <Canvas boardId={params.id}/>
-  )
-}
+    <BoardProvider>
+      <Canvas boardId={params.id} />
+    </BoardProvider>
+  );
+};
 
-export default Page
+export default Page;
