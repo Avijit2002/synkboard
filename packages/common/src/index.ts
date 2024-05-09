@@ -31,5 +31,6 @@ export function wssMessage(type: string, data: any){
 }
 
 export enum wssMessageType{
-    authentication = "authentication"
+    authentication = "authentication",
+    boardInfo = "boardinfo"
 }

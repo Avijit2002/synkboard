@@ -20,7 +20,7 @@ httpServer.listen(process.env.PORT, () => {
 
 
 wss.on('connection', function connection(ws: WebSocketWithAuth, request: IncomingMessage): void {
-    ws.send('Connected to web Socket Server!');
+    ws.send(JSON.stringify('Connected to web Socket Server!'));
     //console.log("client connected "+ request.url)
 
     //ws.on('message', (message) => handleMessage(message, ws))
@@ -32,8 +32,8 @@ wss.on('connection', function connection(ws: WebSocketWithAuth, request: Incomin
     ws.on('error', console.error);
 
     ws.on('close', () => {
-        if (ws.authenticated && ws.userId && ws.boardId) {
-             const key = ws.boardId
+        if (ws.authenticated && ws.user.userId && ws.board.boardId) {
+             const key = ws.board.boardId
 
             // rooms[key] = rooms[key]?.filter(x => x != ws)! // Not able to remove roomId key from object if ws list is empty so used Map instead
 

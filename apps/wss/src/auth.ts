@@ -10,6 +10,9 @@ const UnAuthenticatedMessage = {
     }
 }
 
+
+// we are getting boardId and jwt token from client, we will extract orgId from token and extract orgId to which this boardId belongs from db, if both orgId matches then use is allowed and authenticated
+// Basically we are checking if orgId of board and user is same or not
 export async function auth(data: any, ws: WebSocketWithAuth) {
     //console.log(data)
     const token = data.token
@@ -24,28 +27,36 @@ export async function auth(data: any, ws: WebSocketWithAuth) {
     try {
         if (token && boardId) {
             decoded = jwt.verify(token, publicKey!) as JwtPayload;
-            //console.log(decoded.org_id)
+            //console.log(decoded)
 
-            const orgId = await prisma.boards.findUnique({
+            const board = await prisma.boards.findUnique({
                 where: {
                     id: boardId
                 },
-                select: {
-                    orgId: true
+                select:{
+                    orgId: true,
+                    title: true
                 }
             })
             //console.log(orgId?.orgId, decoded.org_id)
 
-            if (orgId?.orgId === decoded.org_id) {
+            if (board?.orgId === decoded.org_id) {
                 //console.log("hii")
-                ws.boardId = boardId
-                ws.userId = decoded.sub
+                ws.board = {
+                    boardId,
+                    title: board?.title
+                }
+                ws.user = {
+                    userId : decoded.sub,
+                    userName : data.username
+                }
+        
                 //ws.send(JSON.stringify(UnAuthenticatedMessage))
                 return true
             }
         }
         return false
-    } catch (error: any) {
+    } catch (error: any) { 
         console.log(error.message)
         //ws.send("Server Error")
         return false

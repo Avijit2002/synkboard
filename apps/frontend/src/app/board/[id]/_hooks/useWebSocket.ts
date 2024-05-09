@@ -1,4 +1,4 @@
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { wssMessage, wssMessageType } from "@repo/common";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -6,6 +6,7 @@ import { toast } from "sonner";
 export function useWebSocket(boardId: string) {
     const [ws, setWS] = useState<null | WebSocket>(null);
     const { getToken } = useAuth();
+    const { user } = useUser()
 
     useEffect(() => {
         let socket: WebSocket;
@@ -18,6 +19,7 @@ export function useWebSocket(boardId: string) {
                 socket.send(
                     wssMessage(wssMessageType.authentication, {
                         boardId,
+                        username: user?.username,
                         token
                     })
                     // JSON.stringify({

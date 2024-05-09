@@ -1,9 +1,9 @@
 import { WebSocket } from "ws";
 import { auth } from "./auth"
 import { WebSocketWithAuth, typeMessgae } from "./types"
-import {  roomsMap } from "./rooms";
+import { roomsMap } from "./rooms";
 
-import {wssMessageType} from "@repo/common"
+import { wssMessage, wssMessageType } from "@repo/common"
 
 
 export async function handleMessage(message: typeMessgae, ws: WebSocketWithAuth) {
@@ -23,11 +23,19 @@ export async function handleMessage(message: typeMessgae, ws: WebSocketWithAuth)
         // if (rooms[message.data.boardId] && !rooms[message.data.boardId]?.includes(ws)) rooms[message.data.boardId]?.push(ws)
         // else rooms[message.data.boardId] = [ws] // Not able to remove roomId key from object if ws list is empty so used Map instead
 
-        if(roomsMap.get(message.data.boardId) && roomsMap.get(message.data.boardId)?.includes(ws)) roomsMap.get(message.data.boardId)?.push(ws)
-        else roomsMap.set(message.data.boardId,[ws])
+        if (roomsMap.get(ws.board.boardId!)) {
+            if (!roomsMap.get(ws.board.boardId!)?.includes(ws)) roomsMap.get(ws.board.boardId!)?.push(ws)
+            else ws.close()
+        }
+        else roomsMap.set(ws.board.boardId!, [ws])
 
         //console.log(rooms)
         console.log(roomsMap)
+
+        ws.send(wssMessage(wssMessageType.boardInfo, {
+            title: ws.board.title,
+            connectedUser: roomsMap.get(ws.board.boardId!)?.map(x => x.user.userName)
+        }))
 
     }
 
@@ -43,8 +51,6 @@ export async function handleMessage(message: typeMessgae, ws: WebSocketWithAuth)
 
     }
 
-    //TODO: create a global type for messages
-    //TODO: create enums for msg type instead of hard coding
 
 
 }      
