@@ -1,19 +1,22 @@
-"use client"
+"use client";
 
 import { wssMessageType } from "@repo/common";
 import { createContext, useContext, useReducer } from "react";
+import { toast } from "sonner";
 
 interface typeInitialState {
-  activeUser?: string[];
+  isLoaded: boolean;
+  activeUsers?: string[];
   boardTitle?: string;
 }
 
-interface typeInitialContext extends typeInitialState{
-    wssMessageHandler:Function
+interface typeInitialContext extends typeInitialState {
+  wssMessageHandler: Function;
 }
 
 const initialState: typeInitialState = {
-  activeUser: [],
+  isLoaded: false,
+  activeUsers: [],
   boardTitle: "",
 };
 
@@ -24,11 +27,28 @@ function reducer(
   action: { type: string; payload: any }
 ) {
   switch (action.type) {
-    case wssMessageType.boardInfo: {
+    case wssMessageType.server_boardInfo: {
       return {
         ...state,
+        isLoaded: true,
         boardTitle: action.payload.title,
-        activeUser: action.payload.connectedUser,
+        activeUsers: action.payload.connectedUser,
+      };
+    }
+    case wssMessageType.server_userJoined: {
+      toast.success(`${action.payload.joinedUserUsername} joined this room`);
+      return {
+        ...state,
+        activeUsers: [...state.activeUsers!, action.payload.joinedUserUsername],
+      };
+    }
+    case wssMessageType.server_userLeft: {
+      toast.error(`${action.payload.leftUserUsername} left this room`);
+      return {
+        ...state,
+        activeUsers: state.activeUsers?.filter((x) => {
+          return x!=action.payload.leftUserUsername;
+        }),
       };
     }
     default:
@@ -36,35 +56,57 @@ function reducer(
   }
 }
 
-
 const BoardProvider = ({ children }: { children: React.ReactNode }) => {
-  const [{activeUser,boardTitle}, dispatch] = useReducer(reducer, initialState);
+  const [{ activeUsers, boardTitle, isLoaded }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   function wssMessageHandler(message: any) {
     switch (message.type) {
-      case wssMessageType.boardInfo: {
-          dispatch({
-           type: wssMessageType.boardInfo,
-           payload: message.data
-          })
+      case wssMessageType.server_boardInfo: {
+        dispatch({
+          type: wssMessageType.server_boardInfo,
+          payload: message.data,
+        });
+        return;
+      }
+      case wssMessageType.server_userJoined: {
+        dispatch({
+          type: wssMessageType.server_userJoined,
+          payload: message.data,
+        });
+        return;
+      }
+      case wssMessageType.server_userLeft: {
+        dispatch({
+          type: wssMessageType.server_userLeft,
+          payload: message.data,
+        });
+        return;
       }
     }
   }
 
-  return <BoardContext.Provider value={{
-    activeUser,
-    boardTitle,
-    wssMessageHandler
-  }}>{children}</BoardContext.Provider>;
+  return (
+    <BoardContext.Provider
+      value={{
+        isLoaded,
+        activeUsers,
+        boardTitle,
+        wssMessageHandler,
+      }}
+    >
+      {children}
+    </BoardContext.Provider>
+  );
 };
 
 function useBoard() {
-    const context = useContext(BoardContext);
-    if (context === undefined)
-      throw new Error("BoardContext was used outside the BoardProvider");
-    return context;
-  }
-  
-  export { BoardProvider, useBoard };
+  const context = useContext(BoardContext);
+  if (context === undefined)
+    throw new Error("BoardContext was used outside the BoardProvider");
+  return context;
+}
 
-
+export { BoardProvider, useBoard };

@@ -7,6 +7,7 @@ import { useWebSocket } from "../_hooks/useWebSocket";
 import { useEffect, useState } from "react";
 import Loader from "@/components/ui/Loader";
 import { useBoard } from "../_context/BoardContext";
+import { isLastDayOfMonth } from "date-fns";
 
 type Props = {
   boardId: string;
@@ -14,29 +15,27 @@ type Props = {
 
 const Canvas = ({ boardId }: Props) => {
   const { ws } = useWebSocket(boardId);
-  const {wssMessageHandler} = useBoard()!
+  const { wssMessageHandler, isLoaded } = useBoard()!;
 
-  const [activeUser, setActiveUser] = useState<string[]>()
+  const [activeUser, setActiveUser] = useState<string[]>();
 
   useEffect(() => {
-    if (ws) ws.onmessage = (event) => {
-      // always parse the data before passing to any function
-      const message = JSON.parse(event.data)
-      console.log(message)
-      wssMessageHandler(message)
-    
-    }
+    if (ws)
+      ws.onmessage = (event) => {
+        // always parse the data before passing to any function
+        const message = JSON.parse(event.data);
+        console.log(message);
+        wssMessageHandler(message);
+      };
 
-
-    return ()=>{
+    return () => {
       // TODO remove onmessage event listener
-    }
-
-
+    };
   });
-  if (!ws) {
+  if (!(ws && isLoaded)) {
     return <Loader />;
   }
+
   return (
     <main className="h-full w-full relative bg-neutral-100 touch-none">
       <Info />

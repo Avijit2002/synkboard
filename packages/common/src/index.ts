@@ -30,7 +30,17 @@ export function wssMessage(type: string, data: any){
     })
 }
 
+
+// Naming convention followed: sourceOfOrigination_type
 export enum wssMessageType{
-    authentication = "authentication",
-    boardInfo = "boardinfo"
+
+    // client to server
+    client_authentication = "client/authentication",
+
+
+    // server to client
+    server_boardInfo = "server/boardinfo",
+    server_userJoined = "server/userJoined",
+    server_userLeft = "server/userLeft"
+
 }

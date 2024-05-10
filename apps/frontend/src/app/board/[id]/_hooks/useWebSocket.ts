@@ -17,7 +17,7 @@ export function useWebSocket(boardId: string) {
                 console.log("Connected");
                 toast.success("Connected to server!")
                 socket.send(
-                    wssMessage(wssMessageType.authentication, {
+                    wssMessage(wssMessageType.client_authentication, {
                         boardId,
                         username: user?.username,
                         token

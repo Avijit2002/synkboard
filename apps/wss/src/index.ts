@@ -6,6 +6,7 @@ import { WebSocketServer } from "ws";
 import { typeMessgae, WebSocketWithAuth } from "./types";
 import { handleMessage } from "./messageHandler";
 import {  roomsMap } from "./rooms";
+import { wssMessage, wssMessageType } from "@repo/common";
 
 const httpServer = createServer()
 const wss = new WebSocketServer({ server: httpServer });
@@ -33,11 +34,16 @@ wss.on('connection', function connection(ws: WebSocketWithAuth, request: Incomin
 
     ws.on('close', () => {
         if (ws.authenticated && ws.user.userId && ws.board.boardId) {
-             const key = ws.board.boardId
+             const key = ws.board.boardId // here roomId = boardId
 
-            // rooms[key] = rooms[key]?.filter(x => x != ws)! // Not able to remove roomId key from object if ws list is empty so used Map instead
+            roomsMap.get(key)?.forEach((client)=>{
+                ws != client && client.send(wssMessage(wssMessageType.server_userLeft,{leftUserUsername: ws.user.userName}))
+            })
 
+            // removing the client from room
             roomsMap.set(key, roomsMap.get(key)?.filter(x => x!=ws)!)
+
+            // if client is last joined user then removing the room
             !roomsMap.get(key)?.length && roomsMap.delete(key)
             
             //console.log(rooms)
