@@ -15,9 +15,7 @@ type Props = {
 
 const Canvas = ({ boardId }: Props) => {
   const { ws } = useWebSocket(boardId);
-  const { wssMessageHandler, isLoaded } = useBoard()!;
-
-  const [activeUser, setActiveUser] = useState<string[]>();
+  const { wssMessageHandler, isLoaded, canvasState, dispatch } = useBoard()!;
 
   useEffect(() => {
     if (ws)
@@ -47,7 +45,14 @@ const Canvas = ({ boardId }: Props) => {
         send
       </button>
       <Participants />
-      <Toolbar />
+      <Toolbar
+        canvasState={canvasState}
+        dispatch={dispatch}
+        canRdeo={false}
+        canUndo={false}
+        redo={() => {}} // TODO
+        undo={() => {}} // TODO
+      />
     </main>
   );
 };

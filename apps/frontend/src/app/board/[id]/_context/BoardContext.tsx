@@ -1,5 +1,6 @@
 "use client";
 
+import { CanvasMode, CanvasState } from "@/types/canvas";
 import { wssMessageType } from "@repo/common";
 import { createContext, useContext, useReducer } from "react";
 import { toast } from "sonner";
@@ -8,16 +9,22 @@ interface typeInitialState {
   isLoaded: boolean;
   activeUsers?: string[];
   boardTitle?: string;
+
+  canvasState: CanvasState
 }
 
 interface typeInitialContext extends typeInitialState {
   wssMessageHandler: Function;
+  dispatch: ({type,payload}:{type:string,payload:any})=>void
 }
 
 const initialState: typeInitialState = {
   isLoaded: false,
   activeUsers: [],
   boardTitle: "",
+  canvasState: {
+    mode: CanvasMode.None
+  }
 };
 
 const BoardContext = createContext<typeInitialContext | null>(null);
@@ -27,6 +34,8 @@ function reducer(
   action: { type: string; payload: any }
 ) {
   switch (action.type) {
+
+    // WSS Events
     case wssMessageType.server_boardInfo: {
       return {
         ...state,
@@ -51,13 +60,21 @@ function reducer(
         }),
       };
     }
+
+    // Canvas Events
+    case "canvasStateUpdate":{
+      return {
+        ...state,
+        mode: action.payload.mode
+      }
+    }
     default:
       return state;
   }
 }
 
 const BoardProvider = ({ children }: { children: React.ReactNode }) => {
-  const [{ activeUsers, boardTitle, isLoaded }, dispatch] = useReducer(
+  const [{ activeUsers, boardTitle, isLoaded, canvasState }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -91,10 +108,13 @@ const BoardProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <BoardContext.Provider
       value={{
+        dispatch,
         isLoaded,
         activeUsers,
         boardTitle,
         wssMessageHandler,
+
+        canvasState
       }}
     >
       {children}
