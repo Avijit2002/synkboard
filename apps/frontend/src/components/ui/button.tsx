@@ -23,6 +23,8 @@ const buttonVariants = cva(
           "bg-[#fef1f5] text-secondary-foreground hover:bg-[#fef1f5]/80",
         myvar_3:
           "bg-color-p text-primary-foreground hover:bg-[#7230fe]/80",
+        boardActive: "bg-blue-500/20 text-blue-800",
+        board: "hover:bg-blue-500/20 hover:text-blue-800"
         },
       size: {
         default: "h-10 px-4 py-2",
