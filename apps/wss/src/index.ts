@@ -5,7 +5,7 @@ import { WebSocketServer } from "ws";
 
 import { typeMessgae, WebSocketWithAuth } from "./types";
 import { handleMessage } from "./messageHandler";
-import {  roomsMap } from "./rooms";
+import {  roomsMap, userCursorMap } from "./rooms";
 import { wssMessage, wssMessageType } from "@repo/common";
 
 const httpServer = createServer()
@@ -22,12 +22,12 @@ httpServer.listen(process.env.PORT, () => {
 
 wss.on('connection', function connection(ws: WebSocketWithAuth, request: IncomingMessage): void {
     ws.send(JSON.stringify('Connected to web Socket Server!'));
-    //console.log("client connected "+ request.url)
+    console.log("client connected "+ request.url)
 
     //ws.on('message', (message) => handleMessage(message, ws))
     ws.on('message', (message) => {
         const payload: typeMessgae = JSON.parse(message.toString())
-        console.log(payload)
+        //console.log(payload)
         handleMessage(payload, ws)
     })
     ws.on('error', console.error);
@@ -45,9 +45,13 @@ wss.on('connection', function connection(ws: WebSocketWithAuth, request: Incomin
 
             // if client is last joined user then removing the room
             !roomsMap.get(key)?.length && roomsMap.delete(key)
+
+            // removing user from userCursorMap
+            userCursorMap.delete(ws.user.userName!)
             
             //console.log(rooms)
             console.log(roomsMap)
+            console.log(userCursorMap)
         }
         ws.removeAllListeners()
     })

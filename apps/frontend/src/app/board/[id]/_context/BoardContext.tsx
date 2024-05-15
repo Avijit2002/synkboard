@@ -1,21 +1,24 @@
 "use client";
 
-import { CanvasMode, CanvasState } from "@/types/canvas";
+import { CanvasMode, CanvasState, LayerType } from "@/types/canvas";
 import { wssMessageType } from "@repo/common";
 import { createContext, useContext, useReducer } from "react";
 import { toast } from "sonner";
 
 interface typeInitialState {
   isLoaded: boolean;
-  activeUsers?: string[];
+  activeUsers?: {
+    userName: string;
+    cursorLocation?: { x: number; y: number };
+  }[];
   boardTitle?: string;
 
-  canvasState: CanvasState
+  canvasState: CanvasState;
 }
 
 interface typeInitialContext extends typeInitialState {
   wssMessageHandler: Function;
-  dispatch: ({type,payload}:{type:string,payload:any})=>void
+  dispatch: ({ type, payload }: { type: string; payload: any }) => void;
 }
 
 const initialState: typeInitialState = {
@@ -23,8 +26,8 @@ const initialState: typeInitialState = {
   activeUsers: [],
   boardTitle: "",
   canvasState: {
-    mode: CanvasMode.None
-  }
+    mode: CanvasMode.None,
+  },
 };
 
 const BoardContext = createContext<typeInitialContext | null>(null);
@@ -34,21 +37,25 @@ function reducer(
   action: { type: string; payload: any }
 ) {
   switch (action.type) {
-
     // WSS Events
     case wssMessageType.server_boardInfo: {
+      //console.log(action)
       return {
         ...state,
         isLoaded: true,
         boardTitle: action.payload.title,
-        activeUsers: action.payload.connectedUser,
+        activeUsers: action.payload.connectedUser.map((x:string)=>{
+          return {
+            userName: x
+          }
+        }),
       };
     }
     case wssMessageType.server_userJoined: {
       toast.success(`${action.payload.joinedUserUsername} joined this room`);
       return {
         ...state,
-        activeUsers: [...state.activeUsers!, action.payload.joinedUserUsername],
+        activeUsers: [...state.activeUsers!,{userName: action.payload.joinedUserUsername}],
       };
     }
     case wssMessageType.server_userLeft: {
@@ -56,32 +63,53 @@ function reducer(
       return {
         ...state,
         activeUsers: state.activeUsers?.filter((x) => {
-          return x!=action.payload.leftUserUsername;
+          return x.userName != action.payload.leftUserUsername;
         }),
       };
     }
 
     // Canvas Events
-    case "canvasStateUpdate":{
+    case "canvasStateUpdate": {
+      console.log(state.canvasState);
       return {
         ...state,
-        mode: action.payload.mode
-      }
+        canvasState: {
+          ...state.canvasState,
+          mode: action.payload.mode,
+          LayerType: action.payload.LayerType,
+        },
+      };
     }
+
+    case wssMessageType.server_cursorChange: {
+      return {
+        ...state,
+        activeUsers: state.activeUsers?.map(user=>{
+          if(user.userName === action.payload.userName){
+            return {
+              userName: user.userName,
+              cursorLocation: action.payload.cursorLocation
+            }
+          }
+          return user
+        })
+      };
+    }
+
     default:
       return state;
   }
 }
 
 const BoardProvider = ({ children }: { children: React.ReactNode }) => {
-  const [{ activeUsers, boardTitle, isLoaded, canvasState }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [{ activeUsers, boardTitle, isLoaded, canvasState }, dispatch] =
+    useReducer(reducer, initialState);
 
+  // TODO: Refactor this into another file. Don't need to pass in context provider
   function wssMessageHandler(message: any) {
     switch (message.type) {
       case wssMessageType.server_boardInfo: {
+        //console.log(message.data)
         dispatch({
           type: wssMessageType.server_boardInfo,
           payload: message.data,
@@ -102,6 +130,13 @@ const BoardProvider = ({ children }: { children: React.ReactNode }) => {
         });
         return;
       }
+      case wssMessageType.server_cursorChange: {
+        dispatch({
+          type: wssMessageType.server_cursorChange,
+          payload: message.data,
+        });
+        return;
+      }
     }
   }
 
@@ -114,7 +149,7 @@ const BoardProvider = ({ children }: { children: React.ReactNode }) => {
         boardTitle,
         wssMessageHandler,
 
-        canvasState
+        canvasState,
       }}
     >
       {children}

@@ -12,6 +12,7 @@ export function useWebSocket(boardId: string) {
         let socket: WebSocket;
         async function connect() {
             socket = new WebSocket(process.env.WSS_URL!);
+            //console.log(socket)
             const token = await getToken()
             socket.onopen = () => {
                 console.log("Connected");

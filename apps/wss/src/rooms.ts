@@ -7,3 +7,5 @@ import { WebSocketWithAuth } from "./types";
 // Not able to remove roomId key from object if ws list is empty so used Map instead
 
 export const roomsMap = new Map<string, WebSocketWithAuth[]>()
+
+export const userCursorMap = new Map<string, { x: number, y: number } | null>

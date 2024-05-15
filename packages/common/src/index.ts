@@ -22,8 +22,10 @@ export type typeBoard = {
     updatedAt: Date;
   };
 
+
 // WSS server
 
+// Standard message object to send message
 export function wssMessage(type: string, data: any){
     return JSON.stringify({
         type, data
@@ -36,11 +38,13 @@ export enum wssMessageType{
 
     // client to server
     client_authentication = "client/authentication",
+    client_cursorLocation = "client/cursorLocation",
 
 
     // server to client
     server_boardInfo = "server/boardinfo",
     server_userJoined = "server/userJoined",
-    server_userLeft = "server/userLeft"
+    server_userLeft = "server/userLeft",
+    server_cursorChange = "server/cursorChange"
 
 }
