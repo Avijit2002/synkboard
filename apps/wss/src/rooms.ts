@@ -1,4 +1,4 @@
-import { WebSocketWithAuth } from "./types";
+import { Layer, WebSocketWithAuth } from "./types";
 
 // interface typeRooms {
 //     [propName: string]: WebSocketWithAuth[];
@@ -8,4 +8,4 @@ import { WebSocketWithAuth } from "./types";
 
 export const roomsMap = new Map<string, WebSocketWithAuth[]>()
 
-export const userCursorMap = new Map<string, { x: number, y: number } | null>
+export const canvasStateMap = new Map<string,Layer[]>()

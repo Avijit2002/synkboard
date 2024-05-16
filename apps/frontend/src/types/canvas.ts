@@ -61,6 +61,7 @@ export type Camera = {
 
 // This type will be valid for all types of layer. No need of defining separetly
 export type Layer = {
+    id: string
     type: number  // type of layertype LayerType enum Rectangle is number
     x: number
     y: number

@@ -39,12 +39,14 @@ export enum wssMessageType{
     // client to server
     client_authentication = "client/authentication",
     client_cursorLocation = "client/cursorLocation",
+    client_canvasStateUpdate = "client/canvasStateUpdate",
 
 
     // server to client
     server_boardInfo = "server/boardinfo",
     server_userJoined = "server/userJoined",
     server_userLeft = "server/userLeft",
-    server_cursorChange = "server/cursorChange"
+    server_cursorChange = "server/cursorChange",
+    server_updatedCanvasState = "client/updatedCanvasState"
 
 }

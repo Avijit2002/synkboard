@@ -5,7 +5,7 @@ import { WebSocketServer } from "ws";
 
 import { typeMessgae, WebSocketWithAuth } from "./types";
 import { handleMessage } from "./messageHandler";
-import {  roomsMap, userCursorMap } from "./rooms";
+import {  canvasStateMap, roomsMap } from "./rooms";
 import { wssMessage, wssMessageType } from "@repo/common";
 
 const httpServer = createServer()
@@ -43,15 +43,14 @@ wss.on('connection', function connection(ws: WebSocketWithAuth, request: Incomin
             // removing the client from room
             roomsMap.set(key, roomsMap.get(key)?.filter(x => x!=ws)!)
 
-            // if client is last joined user then removing the room
+            // if client is last user then removing the room
             !roomsMap.get(key)?.length && roomsMap.delete(key)
-
-            // removing user from userCursorMap
-            userCursorMap.delete(ws.user.userName!)
             
             //console.log(rooms)
             console.log(roomsMap)
-            console.log(userCursorMap)
+
+            const state = canvasStateMap.get(ws.board.boardId!) // Save this state to DB
+            !roomsMap.get(key)?.length && canvasStateMap.delete(ws.board.boardId)
         }
         ws.removeAllListeners()
     })

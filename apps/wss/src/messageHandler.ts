@@ -1,7 +1,7 @@
 import { WebSocket } from "ws";
 import { auth } from "./auth"
 import { WebSocketWithAuth, typeMessgae } from "./types"
-import { roomsMap, userCursorMap } from "./rooms";
+import { canvasStateMap, roomsMap } from "./rooms";
 
 import { wssMessage, wssMessageType } from "@repo/common"
 
@@ -37,26 +37,26 @@ export async function handleMessage(message: typeMessgae, ws: WebSocketWithAuth)
                 })
 
             }
-            else roomsMap.set(ws.board.boardId!, [ws]) // room does not exist so creating room with roomId = boardId
+            else {
+                roomsMap.set(ws.board.boardId!, [ws]) // room does not exist so creating room with roomId = boardId
+
+                canvasStateMap.set(ws.board.boardId!, []) // Creating global canvas State // TODO: Load it from DB
+            }
 
             //console.log(rooms)
             console.log(roomsMap)
 
-            // adding user to userCursorMap
-            userCursorMap.set(ws.user.userName!, null)
-
-            console.log(userCursorMap)
-
             ws.send(wssMessage(wssMessageType.server_boardInfo, {
                 title: ws.board.title,
-                connectedUser: roomsMap.get(ws.board.boardId!)?.map(x => x.user.userName)
+                connectedUser: roomsMap.get(ws.board.boardId!)?.map(x => x.user.userName),
+                state: canvasStateMap.get(ws.board.boardId!)
             }))
 
-        }else{
+        } else {
             //ws.close(1000, "Unauthorized!")
             return
         }
-    } 
+    }
 
 
     // TODO HERE PROCESS THE MESSAGE
@@ -67,13 +67,28 @@ export async function handleMessage(message: typeMessgae, ws: WebSocketWithAuth)
 
             // Broadcasting received cursor location to all the connected users
             roomsMap.get(ws.board.boardId!)?.forEach(client => {
-                ws!=client && client.send(wssMessage(wssMessageType.server_cursorChange, {
+                ws != client && client.send(wssMessage(wssMessageType.server_cursorChange, {
                     userName: ws.user.userName,
                     cursorLocation: message.data.cursorLocation
                 }))
             })
             break;
 
+        case wssMessageType.client_canvasStateUpdate: {
+
+            //console.log(message.data.newLayer)
+
+            canvasStateMap.get(ws.board.boardId!)?.push(message.data.newLayer)
+            console.log(canvasStateMap.get(ws.board.boardId!))
+
+            roomsMap.get(ws.board.boardId!)?.forEach((client) => {
+                client.send(wssMessage(wssMessageType.server_updatedCanvasState, {
+                    state: canvasStateMap.get(ws.board.boardId!)
+                }))
+            })
+
+            break;
+        }
         default:
             break;
     }

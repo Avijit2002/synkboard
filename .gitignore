@@ -7,6 +7,8 @@ node_modules
 
 assets
 
+videos
+
 # Local env files
 .env
 .env.local

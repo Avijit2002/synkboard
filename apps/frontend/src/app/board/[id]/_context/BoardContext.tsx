@@ -1,6 +1,6 @@
 "use client";
 
-import { CanvasMode, CanvasState, LayerType } from "@/types/canvas";
+import { CanvasMode, CanvasState, Layer, LayerType } from "@/types/canvas";
 import { wssMessageType } from "@repo/common";
 import { createContext, useContext, useReducer } from "react";
 import { toast } from "sonner";
@@ -10,10 +10,11 @@ interface typeInitialState {
   activeUsers?: {
     userName: string;
     cursorLocation?: { x: number; y: number } | undefined;
-  }[];  // list of connected user object. Each object contains username and cursor location
+  }[]; // list of connected user object. Each object contains username and cursor location
   boardTitle?: string;
 
   canvasState: CanvasState;
+  canvasLayers: Layer[];
 }
 
 interface typeInitialContext extends typeInitialState {
@@ -27,6 +28,8 @@ const initialState: typeInitialState = {
   canvasState: {
     mode: CanvasMode.None,
   },
+
+  canvasLayers: [],
 };
 
 const BoardContext = createContext<typeInitialContext | null>(null);
@@ -38,23 +41,27 @@ function reducer(
   switch (action.type) {
     // WSS Events
     case wssMessageType.server_boardInfo: {
-      //console.log(action)
+      console.log(action)
       return {
         ...state,
         isLoaded: true,
         boardTitle: action.payload.title,
-        activeUsers: action.payload.connectedUser.map((x:string)=>{
+        activeUsers: action.payload.connectedUser.map((x: string) => {
           return {
-            userName: x
-          }
+            userName: x,
+          };
         }),
+        canvasLayers: action.payload.state
       };
     }
     case wssMessageType.server_userJoined: {
       toast.success(`${action.payload.joinedUserUsername} joined this room`);
       return {
         ...state,
-        activeUsers: [...state.activeUsers!,{userName: action.payload.joinedUserUsername}],
+        activeUsers: [
+          ...state.activeUsers!,
+          { userName: action.payload.joinedUserUsername },
+        ],
       };
     }
     case wssMessageType.server_userLeft: {
@@ -85,16 +92,24 @@ function reducer(
       // Mapping through the list of active users, whose username matches, cursor location is updated
       return {
         ...state,
-        activeUsers: state.activeUsers?.map(user=>{
-          if(user.userName === action.payload.userName){
+        activeUsers: state.activeUsers?.map((user) => {
+          if (user.userName === action.payload.userName) {
             return {
               userName: user.userName,
-              cursorLocation: action.payload.cursorLocation
-            }
+              cursorLocation: action.payload.cursorLocation,
+            };
           }
-          return user
-        })
+          return user;
+        }),
       };
+    }
+
+    case wssMessageType.server_updatedCanvasState:{
+      return {
+        ...state,
+        canvasLayers: action.payload.state
+
+      }
     }
 
     default:
@@ -103,11 +118,13 @@ function reducer(
 }
 
 const BoardProvider = ({ children }: { children: React.ReactNode }) => {
-  const [{ activeUsers, boardTitle, isLoaded, canvasState }, dispatch] =
-    useReducer(reducer, initialState);
+
+  const [
+    { activeUsers, boardTitle, isLoaded, canvasState, canvasLayers },
+    dispatch,
+  ] = useReducer(reducer, initialState);
 
   // TODO: Refactor this into another file. Don't need to pass in context provider
- 
 
   return (
     <BoardContext.Provider
@@ -118,6 +135,7 @@ const BoardProvider = ({ children }: { children: React.ReactNode }) => {
         boardTitle,
 
         canvasState,
+        canvasLayers,
       }}
     >
       {children}

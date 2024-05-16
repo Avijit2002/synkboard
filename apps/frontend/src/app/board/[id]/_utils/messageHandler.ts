@@ -40,5 +40,14 @@ export function wssMessageHandler(dispatch: ({ type, payload }: { type: string; 
             });
             return;
         }
+
+        case wssMessageType.server_updatedCanvasState: {
+
+            dispatch({
+                type: wssMessageType.server_updatedCanvasState,
+                payload: message.data
+            })
+            return;
+        }
     }
 }

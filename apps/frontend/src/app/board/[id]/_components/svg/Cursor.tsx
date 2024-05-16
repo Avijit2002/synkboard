@@ -19,7 +19,7 @@ const Cursor = memo(({ userName, cursorLocation }: Props) => {
   }
   const { x, y } = cursorLocation;
 
-  console.log(x);
+  //console.log(x);
   return (
     <>
       <foreignObject
