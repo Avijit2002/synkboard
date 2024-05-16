@@ -13,7 +13,7 @@ type Props = {
   };
 };
 
-const Cursor = ({ userName, cursorLocation }: Props) => {
+const Cursor = memo(({ userName, cursorLocation }: Props) => {
   if (!cursorLocation) {
     return null;
   }
@@ -23,6 +23,7 @@ const Cursor = ({ userName, cursorLocation }: Props) => {
   return (
     <>
       <foreignObject
+        // foreignObject used to embed html into svg
         style={{
           transform: `translateX(${x}px) translateY(${y}px)`,
         }}
@@ -45,6 +46,6 @@ const Cursor = ({ userName, cursorLocation }: Props) => {
       </foreignObject>
     </>
   );
-};
+});
 
 export default Cursor;

@@ -9,15 +9,14 @@ interface typeInitialState {
   isLoaded: boolean;
   activeUsers?: {
     userName: string;
-    cursorLocation?: { x: number; y: number };
-  }[];
+    cursorLocation?: { x: number; y: number } | undefined;
+  }[];  // list of connected user object. Each object contains username and cursor location
   boardTitle?: string;
 
   canvasState: CanvasState;
 }
 
 interface typeInitialContext extends typeInitialState {
-  wssMessageHandler: Function;
   dispatch: ({ type, payload }: { type: string; payload: any }) => void;
 }
 
@@ -82,6 +81,8 @@ function reducer(
     }
 
     case wssMessageType.server_cursorChange: {
+      // Updating cursor location of user received from wss server.
+      // Mapping through the list of active users, whose username matches, cursor location is updated
       return {
         ...state,
         activeUsers: state.activeUsers?.map(user=>{
@@ -106,39 +107,7 @@ const BoardProvider = ({ children }: { children: React.ReactNode }) => {
     useReducer(reducer, initialState);
 
   // TODO: Refactor this into another file. Don't need to pass in context provider
-  function wssMessageHandler(message: any) {
-    switch (message.type) {
-      case wssMessageType.server_boardInfo: {
-        //console.log(message.data)
-        dispatch({
-          type: wssMessageType.server_boardInfo,
-          payload: message.data,
-        });
-        return;
-      }
-      case wssMessageType.server_userJoined: {
-        dispatch({
-          type: wssMessageType.server_userJoined,
-          payload: message.data,
-        });
-        return;
-      }
-      case wssMessageType.server_userLeft: {
-        dispatch({
-          type: wssMessageType.server_userLeft,
-          payload: message.data,
-        });
-        return;
-      }
-      case wssMessageType.server_cursorChange: {
-        dispatch({
-          type: wssMessageType.server_cursorChange,
-          payload: message.data,
-        });
-        return;
-      }
-    }
-  }
+ 
 
   return (
     <BoardContext.Provider
@@ -147,7 +116,6 @@ const BoardProvider = ({ children }: { children: React.ReactNode }) => {
         isLoaded,
         activeUsers,
         boardTitle,
-        wssMessageHandler,
 
         canvasState,
       }}

@@ -14,7 +14,7 @@ const Participants = (props: Props) => {
       <ul>
         {activeUsers?.map((x)=> {
           const color = usernameToColor(x.userName)
-          if(user?.username === x.userName)  return <li key={Math.random()} style={{color:`${color}`}}>You</li>
+          if(user?.username === x.userName)  return <li key={Math.random()} style={{color:`${color}`}}>You ({x.userName})</li>
           return <li key={Math.random()} style={{color:`${color}`}}>{x.userName} </li>
         })}
       </ul>

@@ -63,8 +63,9 @@ export async function handleMessage(message: typeMessgae, ws: WebSocketWithAuth)
     // if control reaches here means request is authenticated 
     switch (message.type) {
         case wssMessageType.client_cursorLocation:
-            userCursorMap.set(ws.user.userName!, message.data)
             //console.log(userCursorMap)
+
+            // Broadcasting received cursor location to all the connected users
             roomsMap.get(ws.board.boardId!)?.forEach(client => {
                 ws!=client && client.send(wssMessage(wssMessageType.server_cursorChange, {
                     userName: ws.user.userName,
