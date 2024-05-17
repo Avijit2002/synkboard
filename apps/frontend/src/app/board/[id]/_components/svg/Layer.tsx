@@ -1,20 +1,24 @@
 "use client";
 
 import { LayerType, type Layer } from "@/types/canvas";
+import Rectangle from "./Rectangle";
+import { PointerEvent } from "react";
 
 type Props = {
   layer: Layer;
+  onLayerPointerDown : (e: PointerEvent, layerId: string) => void;
+  selectionColor: string | null
 };
 
-const Layer = ({ layer }: Props) => {
+const CanvasLayer = ({ layer, onLayerPointerDown,selectionColor }: Props) => {
    
   switch (layer.type) {
     case LayerType.Rectangle: {
         return(
-            <rect height={layer.height} width={layer.width} x={layer.x} y={layer.y} fill="#000" />
+           <Rectangle layer={layer} onPointerDown={onLayerPointerDown} selectionColor={selectionColor}/>
         )
     }
   }
 };
 
-export default Layer;
+export default CanvasLayer;

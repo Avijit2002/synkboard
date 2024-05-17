@@ -40,6 +40,7 @@ export enum wssMessageType{
     client_authentication = "client/authentication",
     client_cursorLocation = "client/cursorLocation",
     client_canvasStateUpdate = "client/canvasStateUpdate",
+    client_canvasLayerDelete = "client/canvasLayerDelete",
 
 
     // server to client

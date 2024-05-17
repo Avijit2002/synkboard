@@ -8,7 +8,7 @@ import Loader from "@/components/ui/Loader";
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["500"],
 });
 
 export const metadata: Metadata = {

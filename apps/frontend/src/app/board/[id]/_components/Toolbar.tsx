@@ -31,6 +31,7 @@ const Toolbar = ({
   canRdeo,
   canUndo,
 }: ToolbarProps) => {
+  console.log(canUndo)
   return (
     <div className="absolute top-1/2 left-3 -translate-y-1/2 p-3 flex flex-col gap-y-5 content-center items-center">
       <div className="shadow-sm rounded-md bg-white flex flex-col items-center gap-y-3 p-2 w-full">
@@ -148,17 +149,18 @@ const Toolbar = ({
 
 
       <div className="shadow-sm rounded-md bg-white flex flex-col items-center gap-y-3 py-2 w-full">
+        
         <ToolButton
           label="Undo"
           icon={Undo2}
-          onClick={() => {}}
+          onClick={undo}
           isActive={false}
           isDisabled={!canUndo}
         />
         <ToolButton
           label="Redo"
           icon={Redo2}
-          onClick={() => {}}
+          onClick={redo}
           isActive={false}
           isDisabled={!canRdeo}
         />

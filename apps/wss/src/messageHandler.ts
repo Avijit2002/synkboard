@@ -89,6 +89,22 @@ export async function handleMessage(message: typeMessgae, ws: WebSocketWithAuth)
 
             break;
         }
+        case wssMessageType.client_canvasLayerDelete: {
+
+            console.log(message.data.LayerId)
+
+            const updatedState = canvasStateMap.get(ws.board.boardId!)?.filter(x => x.id !== message.data.LayerId)
+            canvasStateMap.set(ws.board.boardId!,updatedState!)
+            console.log(canvasStateMap.get(ws.board.boardId!))
+
+            roomsMap.get(ws.board.boardId!)?.forEach((client) => {
+                client.send(wssMessage(wssMessageType.server_updatedCanvasState, {
+                    state: canvasStateMap.get(ws.board.boardId!)
+                }))
+            })
+
+            break;
+        }
         default:
             break;
     }
