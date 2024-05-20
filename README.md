@@ -1,7 +1,7 @@
 ### Synkboard - Sync your ideas, brainstorm together.
 
-## Realtime collaborative white board. 
-## Status - Under development
+# Realtime collaborative white board. 
+# Status - Under development
 
 
 ### Build
