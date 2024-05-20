@@ -13,18 +13,13 @@ export async function handleMessage(message: typeMessgae, ws: WebSocketWithAuth)
         if (message.type === wssMessageType.client_authentication) {
             ws.authenticated = await auth(message.data, ws)
 
-            // if auth fails then closing the conn
+            // if auth fails then closing the connection
             if (!ws.authenticated) {  // added false for dev purpose, remove it after dev 
-                //console.log("point-1")
                 ws.close(1000, "unauthorized!")
                 return
             }
 
             // adding client to valid room
-
-            // if (rooms[message.data.boardId] && !rooms[message.data.boardId]?.includes(ws)) rooms[message.data.boardId]?.push(ws)
-            // else rooms[message.data.boardId] = [ws] // Not able to remove roomId key from object if ws list is empty so used Map instead
-
             if (roomsMap.get(ws.board.boardId!)) {  // checking if room exist or not
 
                 // adding new client to room with a prechecking if this client already exist or not

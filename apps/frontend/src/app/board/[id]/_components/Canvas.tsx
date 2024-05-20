@@ -147,8 +147,12 @@ const Canvas = ({ boardId }: Props) => {
       });
   };
 
+  function onLayerMouseMove(){}
+
   function onLayerPointerDown(e: PointerEvent, layerId: string) {
     console.log(e);
+    const ele = e.target
+    ele.addEventListener('onmousemove',onLayerMouseMove)
   }
 
   if (!(ws && isLoaded)) {
