@@ -147,12 +147,31 @@ const Canvas = ({ boardId }: Props) => {
       });
   };
 
-  function onLayerMouseMove(){}
 
-  function onLayerPointerDown(e: PointerEvent, layerId: string) {
+  function onLayerPointerDown(e: PointerEvent<SVGRectElement>, layerId: string) {
     console.log(e);
-    const ele = e.target
-    ele.addEventListener('onmousemove',onLayerMouseMove)
+    const ele = e.target as SVGElement
+  
+    ele.onpointermove = (e)=>{
+      ele.setAttribute('x',e.clientX.toString())
+      ele.setAttribute('y',e.clientY.toString())
+    }
+
+    ele.onpointerleave = (e)=>{
+      ele.onpointermove = null
+    }
+
+    ele.onpointerup = (e)=>{
+      ele.onpointermove = null
+    }
+    
+    //console.log("jii")
+  }
+
+  function onLayerPointerUp(e: PointerEvent){
+    console.log(e)
+    const ele = e.target as SVGElement
+    
   }
 
   if (!(ws && isLoaded)) {
@@ -255,6 +274,7 @@ const Canvas = ({ boardId }: Props) => {
                   layer={l}
                   key={l.id}
                   onLayerPointerDown={onLayerPointerDown}
+                  onLayerPointerUp={onLayerPointerUp}
                   selectionColor={null}
                 />
               );
