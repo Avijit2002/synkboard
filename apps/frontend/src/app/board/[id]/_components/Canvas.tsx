@@ -163,6 +163,7 @@ const Canvas = ({ boardId }: Props) => {
 
     ele.onpointerup = (e)=>{
       ele.onpointermove = null
+      
     }
     
     //console.log("jii")
