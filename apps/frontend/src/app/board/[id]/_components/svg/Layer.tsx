@@ -1,22 +1,23 @@
 "use client";
 
-import { LayerType, type Layer } from "@/types/canvas";
+import { LayerType } from "@/types/canvas";
 import Rectangle from "./Rectangle";
 import { PointerEvent } from "react";
+import { Layer } from "@repo/common";
 
 type Props = {
   layer: Layer;
-  onLayerPointerDown : (e: PointerEvent<SVGRectElement>, layerId: string) => void;
-  onLayerPointerUp: (e: PointerEvent) => void
+  // onLayerPointerDown : (e: PointerEvent<SVGRectElement>, layerId: string) => void;
+  // onLayerPointerUp: (e: PointerEvent) => void
   selectionColor: string | null
 };
 
-const CanvasLayer = ({ layer, onLayerPointerDown,selectionColor,onLayerPointerUp }: Props) => {
-   
+const CanvasLayer = ({ layer,selectionColor }: Props) => {
+
   switch (layer.type) {
     case LayerType.Rectangle: {
         return(
-           <Rectangle layer={layer} onPointerDown={onLayerPointerDown} onPointerUp={onLayerPointerUp} selectionColor={selectionColor}/>
+           <Rectangle layer={layer} selectionColor={selectionColor}/>
         )
     }
   }

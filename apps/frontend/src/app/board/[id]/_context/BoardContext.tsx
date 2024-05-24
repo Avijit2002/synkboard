@@ -1,7 +1,7 @@
 "use client";
 
-import { CanvasMode, CanvasState, Layer, LayerType } from "@/types/canvas";
-import { wssMessageType } from "@repo/common";
+import { CanvasMode, CanvasState, LayerType } from "@/types/canvas";
+import { Layer, wssMessageType } from "@repo/common";
 import { createContext, useContext, useReducer } from "react";
 import { toast } from "sonner";
 
@@ -15,6 +15,7 @@ interface typeInitialState {
 
   canvasState: CanvasState;
   canvasLayers: Layer[];
+  color: string;
 }
 
 interface typeInitialContext extends typeInitialState {
@@ -30,6 +31,7 @@ const initialState: typeInitialState = {
   },
 
   canvasLayers: [],
+  color:"#7230FE"
 };
 
 const BoardContext = createContext<typeInitialContext | null>(null);
@@ -87,6 +89,13 @@ function reducer(
       };
     }
 
+    case "colorChange":{
+      return {
+        ...state,
+        color: action.payload.newColor
+      }
+    }
+
     case wssMessageType.server_cursorChange: {
       // Updating cursor location of user received from wss server.
       // Mapping through the list of active users, whose username matches, cursor location is updated
@@ -120,7 +129,7 @@ function reducer(
 const BoardProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [
-    { activeUsers, boardTitle, isLoaded, canvasState, canvasLayers },
+    { activeUsers, boardTitle, isLoaded, canvasState, canvasLayers,color },
     dispatch,
   ] = useReducer(reducer, initialState);
 
@@ -136,6 +145,7 @@ const BoardProvider = ({ children }: { children: React.ReactNode }) => {
 
         canvasState,
         canvasLayers,
+        color
       }}
     >
       {children}

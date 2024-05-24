@@ -1,4 +1,5 @@
-import { Layer } from "@/types/canvas";
+import { Layer } from "@repo/common";
+
 
 // program to implement stack data structure
 export class Stack {

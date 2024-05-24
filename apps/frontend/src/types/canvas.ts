@@ -58,19 +58,22 @@ export type Camera = {
 }
 
 
+// Moved to common package, as it is shared by both client and server
 
 // This type will be valid for all types of layer. No need of defining separetly
-export type Layer = {
-    id: string
-    type: number  // type of layertype LayerType enum Rectangle is number
-    x: number
-    y: number
-    height: number,
-    width: number,
-    fill: Color,
-    points?: number[][] // for path layer
-    value?: string   // for note layer
-}
+// export type Layer = {
+//     id: string
+//     type: number  // type of layertype LayerType enum Rectangle is number
+//     x: number
+//     y: number
+//     height: number,
+//     width: number,
+//     fill: Color,
+//     points?: number[][] // for path layer
+//     value?: string   // for note layer
+
+//     selectedBy?: string
+// }
 
 export type Point = {
     x: number,

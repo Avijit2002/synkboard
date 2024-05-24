@@ -15,13 +15,20 @@ import Loader from "@/components/ui/Loader";
 import { useBoard } from "../_context/BoardContext";
 import CursorsPresence from "./svg/CursorsPresence";
 import useMousePosition from "../_hooks/useMousePosition";
-import { wssMessage, wssMessageType } from "@repo/common";
+import { Layer, wssMessage, wssMessageType } from "@repo/common";
 import { wssMessageHandler } from "../_utils/messageHandler";
-import { Camera, CanvasMode, Layer, LayerType } from "@/types/canvas";
+import { Camera, CanvasMode, LayerType } from "@/types/canvas";
 import { nanoid } from "nanoid";
 import CanvasLayer from "./svg/Layer";
 import { MousePointToCanvasPoint } from "@/lib/utils";
 import { Stack } from "../_utils/stack";
+import {
+  redoHandler,
+  redoStack,
+  undoHandler,
+  undoStack,
+} from "../_utils/undoRedoHandler";
+import { hex2rgb } from "../_utils/hexToRgb";
 
 type Props = {
   boardId: string;
@@ -29,11 +36,8 @@ type Props = {
 
 const MAX_LAYERS = 100;
 
-const undoStack = new Stack();
-const redoStack = new Stack();
-
 const Canvas = ({ boardId }: Props) => {
-
+  //Local States
   const [canUndoRedo, setCanUndoRedo] = useState({
     canUndo: false,
     canRedo: false,
@@ -42,11 +46,12 @@ const Canvas = ({ boardId }: Props) => {
     x: 0,
     y: 0,
   });
+
   const { ws } = useWebSocket(boardId);
 
-  const { isLoaded, canvasState, dispatch, canvasLayers } = useBoard()!;
+  const { isLoaded, canvasState, dispatch, canvasLayers,color } = useBoard()!;
 
-  console.log(canvasLayers);
+  //console.log(canvasLayers);
 
   useEffect(() => {
     if (ws) {
@@ -63,6 +68,8 @@ const Canvas = ({ boardId }: Props) => {
     };
   }, [ws]);
 
+  // Sending cursor location to WSS
+  // Listens to change in svg element
   const handleMouseMove = (e: MouseEvent<SVGSVGElement>) => {
     const { x, y } = MousePointToCanvasPoint(e, camera);
     e.preventDefault();
@@ -79,6 +86,8 @@ const Canvas = ({ boardId }: Props) => {
     }
   };
 
+  // Handling scroll to get infinite space canvas
+  // Listens to change in svg element
   const handleWheel = (e: WheelEvent<SVGSVGElement>) => {
     setCamera((camera) => {
       return {
@@ -88,6 +97,8 @@ const Canvas = ({ boardId }: Props) => {
     });
   };
 
+  // Handling if mouse leaves the canvas window
+  // Listens to change in svg element
   const handleMouseLeave = (e: MouseEvent<SVGSVGElement>) => {
     e.preventDefault();
     if (ws && ws.readyState === ws.OPEN) {
@@ -99,6 +110,8 @@ const Canvas = ({ boardId }: Props) => {
     }
   };
 
+  // Handling on pointer down
+  // Listens on svg element
   const handleOnPointerDown = (e: PointerEvent<SVGSVGElement>) => {
     // Create a layer object of type canvasmode
     // Give all properties to it like id, position, color etc...
@@ -117,19 +130,13 @@ const Canvas = ({ boardId }: Props) => {
       y: y,
       height: 100,
       width: 100,
-      fill: {
-        r: 0,
-        g: 0,
-        b: 0,
-      },
+      fill: hex2rgb(color)
     };
 
     console.log(newLayer);
 
-    // push to history stack
-    // TODO
-
-    // push to wss server and undoRedoHistory stack
+    // push to wss server and undo stack
+    // Operation: Layer create // TODO: Make it resuable
     if (ws && ws.readyState === ws.OPEN) {
       ws.send(
         wssMessage(wssMessageType.client_canvasStateUpdate, {
@@ -137,6 +144,7 @@ const Canvas = ({ boardId }: Props) => {
         })
       );
     }
+
     undoStack.push(newLayer);
     if (!undoStack.isEmpty())
       setCanUndoRedo((canUndoRedo) => {
@@ -147,34 +155,6 @@ const Canvas = ({ boardId }: Props) => {
       });
   };
 
-
-  function onLayerPointerDown(e: PointerEvent<SVGRectElement>, layerId: string) {
-    console.log(e);
-    const ele = e.target as SVGElement
-  
-    ele.onpointermove = (e)=>{
-      ele.setAttribute('x',e.clientX.toString())
-      ele.setAttribute('y',e.clientY.toString())
-    }
-
-    ele.onpointerleave = (e)=>{
-      ele.onpointermove = null
-    }
-
-    ele.onpointerup = (e)=>{
-      ele.onpointermove = null
-      
-    }
-    
-    //console.log("jii")
-  }
-
-  function onLayerPointerUp(e: PointerEvent){
-    console.log(e)
-    const ele = e.target as SVGElement
-    
-  }
-
   if (!(ws && isLoaded)) {
     return <Loader />;
   }
@@ -184,76 +164,11 @@ const Canvas = ({ boardId }: Props) => {
       <Info />
       <Participants />
       <Toolbar
-        canvasState={canvasState}
-        dispatch={dispatch}
         canRdeo={canUndoRedo.canRedo}
         canUndo={canUndoRedo.canUndo}
-        redo={() => {
-          if (!redoStack.isEmpty()) {
-            const popedLayer = redoStack.pop();
+         redo={() => redoHandler(ws, setCanUndoRedo)} // TODO
+         undo={() => undoHandler(ws, setCanUndoRedo)} // TODO
 
-            if (redoStack.isEmpty()) {
-              setCanUndoRedo((canUndoRedo) => {
-                return {
-                  ...canUndoRedo,
-                  canRedo: false,
-                };
-              });
-            }
-
-            if (ws && ws.readyState === ws.OPEN) {
-              ws.send(
-                wssMessage(wssMessageType.client_canvasStateUpdate, {
-                  newLayer: popedLayer,
-                })
-              );
-            }
-
-            undoStack.push(popedLayer!);
-
-            setCanUndoRedo((canUndoRedo) => {
-              return {
-                ...canUndoRedo,
-                canUndo: true,
-              };
-            });
-            //console.log(undoStack);
-            //console.log(redoStack);
-          }
-        }} // TODO
-        undo={() => {
-          if (!undoStack.isEmpty()) {
-            const popedLayer = undoStack.pop();
-
-            if (undoStack.isEmpty()) {
-              setCanUndoRedo((canUndoRedo) => {
-                return {
-                  ...canUndoRedo,
-                  canUndo: false,
-                };
-              });
-            }
-            
-            if (ws && ws.readyState === ws.OPEN) {
-              ws.send(
-                wssMessage(wssMessageType.client_canvasLayerDelete, {
-                  LayerId: popedLayer?.id,
-                })
-              );
-            }
-
-
-            redoStack.push(popedLayer!);
-            setCanUndoRedo((canUndoRedo) => {
-              return {
-                ...canUndoRedo,
-                canRedo: true,
-              };
-            });
-            //console.log(undoStack);
-            //console.log(redoStack);
-          } 
-        }} // TODO
       />
       <svg
         className="h-screen w-screen"
@@ -274,8 +189,8 @@ const Canvas = ({ boardId }: Props) => {
                 <CanvasLayer
                   layer={l}
                   key={l.id}
-                  onLayerPointerDown={onLayerPointerDown}
-                  onLayerPointerUp={onLayerPointerUp}
+                  //onLayerPointerDown={onLayerPointerDown}
+                  //onLayerPointerUp={onLayerPointerUp}
                   selectionColor={null}
                 />
               );
@@ -288,3 +203,31 @@ const Canvas = ({ boardId }: Props) => {
 };
 
 export default Canvas;
+
+// function onLayerPointerDown(
+//   e: PointerEvent<SVGRectElement>,
+//   layerId: string
+// ) {
+//   console.log(e);
+//   const ele = e.target as SVGElement;
+
+//   ele.onpointermove = (e) => {
+//     ele.setAttribute("x", e.clientX.toString());
+//     ele.setAttribute("y", e.clientY.toString());
+//   };
+
+//   ele.onpointerleave = (e) => {
+//     ele.onpointermove = null;
+//   };
+
+//   ele.onpointerup = (e) => {
+//     ele.onpointermove = null;
+//   };
+
+//   //console.log("jii")
+// }
+
+// function onLayerPointerUp(e: PointerEvent) {
+//   console.log(e);
+//   const ele = e.target as SVGElement;
+// }

@@ -3,6 +3,7 @@ import ToolButton from "./ToolButton";
 import {
   Circle,
   MousePointer2,
+  Palette,
   Pencil,
   Redo,
   Redo2,
@@ -13,25 +14,19 @@ import {
 } from "lucide-react";
 
 import { CanvasMode, CanvasState, LayerType } from "@/types/canvas";
+import { useBoard } from "../_context/BoardContext";
 
 type ToolbarProps = {
-  canvasState: CanvasState;
-  dispatch: ({ type, payload }: { type: string; payload: any }) => void;
   undo: () => void;
   redo: () => void;
   canUndo: boolean;
   canRdeo: boolean;
 };
 
-const Toolbar = ({
-  canvasState,
-  dispatch,
-  undo,
-  redo,
-  canRdeo,
-  canUndo,
-}: ToolbarProps) => {
-  console.log(canUndo)
+const Toolbar = ({ undo, redo, canRdeo, canUndo }: ToolbarProps) => {
+  const { dispatch, canvasState, color } = useBoard()!;
+
+  //console.log(canUndo);
   return (
     <div className="absolute top-1/2 left-3 -translate-y-1/2 p-3 flex flex-col gap-y-5 content-center items-center">
       <div className="shadow-sm rounded-md bg-white flex flex-col items-center gap-y-3 p-2 w-full">
@@ -63,7 +58,7 @@ const Toolbar = ({
               type: "canvasStateUpdate",
               payload: {
                 mode: CanvasMode.Inserting,
-                LayerType: LayerType.Text
+                LayerType: LayerType.Text,
               },
             })
           }
@@ -81,7 +76,7 @@ const Toolbar = ({
               type: "canvasStateUpdate",
               payload: {
                 mode: CanvasMode.Inserting,
-                LayerType: LayerType.Note
+                LayerType: LayerType.Note,
               },
             })
           }
@@ -99,7 +94,7 @@ const Toolbar = ({
               type: "canvasStateUpdate",
               payload: {
                 mode: CanvasMode.Inserting,
-                LayerType: LayerType.Rectangle
+                LayerType: LayerType.Rectangle,
               },
             })
           }
@@ -117,7 +112,7 @@ const Toolbar = ({
               type: "canvasStateUpdate",
               payload: {
                 mode: CanvasMode.Inserting,
-                LayerType: LayerType.Ellipse
+                LayerType: LayerType.Ellipse,
               },
             })
           }
@@ -138,18 +133,24 @@ const Toolbar = ({
               },
             })
           }
-          isActive={
-            canvasState.mode === CanvasMode.Pencil  
-          }
+          isActive={canvasState.mode === CanvasMode.Pencil}
           isDisabled={false}
         />
       </div>
 
-
-
+      <div className="shadow-sm rounded-md bg-white flex flex-col items-center gap-y-3 py-2 w-full">
+        <Palette />
+        <input type="color" value={color} onChange={(e) => {
+          dispatch({
+            type: "colorChange",
+            payload: {
+              newColor: e.target.value
+            }
+          })
+        }} />
+      </div>
 
       <div className="shadow-sm rounded-md bg-white flex flex-col items-center gap-y-3 py-2 w-full">
-        
         <ToolButton
           label="Undo"
           icon={Undo2}

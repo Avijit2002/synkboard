@@ -1,14 +1,15 @@
-import { Layer } from "@/types/canvas";
+import { Layer } from "@repo/common";
 import { PointerEvent } from "react";
+import { rgbToHex } from "../../_utils/RgbtoHex";
 
 type Props = {
   layer: Layer;
-  onPointerDown: (e: PointerEvent<SVGRectElement>, layerId: string) => void;
-  onPointerUp : (e:PointerEvent<SVGRectElement>) => void
+  // onPointerDown: (e: PointerEvent<SVGRectElement>, layerId: string) => void;
+  // onPointerUp : (e:PointerEvent<SVGRectElement>) => void
   selectionColor: string | null;
 };
 
-const Rectangle = ({ layer, onPointerDown, selectionColor,onPointerUp }: Props) => {
+const Rectangle = ({ layer, selectionColor }: Props) => {
   const { x, y, height, width, fill } = layer;
   return (
     <rect
@@ -19,10 +20,10 @@ const Rectangle = ({ layer, onPointerDown, selectionColor,onPointerUp }: Props) 
       }}
       x={x}
       y={y}
-      fill="#000"
+      fill={rgbToHex(fill)}
       strokeWidth={1}
       stroke="transparent"
-      onPointerDown={(e) => onPointerDown(e, layer.id)}
+      //onPointerDown={(e) => onPointerDown(e, layer.id)}
       //onPointerUp={(e)=>onPointerUp(e)}
       //onPointerMove={(e)=>{console.log(e)}}
     />

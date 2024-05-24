@@ -1,4 +1,5 @@
-import { Layer, WebSocketWithAuth } from "./types";
+import { Layer } from "@repo/common";
+import { WebSocketWithAuth } from "./types";
 
 // interface typeRooms {
 //     [propName: string]: WebSocketWithAuth[];
