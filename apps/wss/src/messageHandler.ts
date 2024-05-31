@@ -100,6 +100,29 @@ export async function handleMessage(message: typeMessgae, ws: WebSocketWithAuth)
 
             break;
         }
+
+        case wssMessageType.client_canvasLayerSelect: {
+            console.log(message.data.LayerId)
+
+            canvasStateMap.get(ws.board.boardId!)?.forEach(layer=>{
+                if(layer.selectedBy === ws.user.userName) layer.selectedBy = undefined  // if 
+                if(layer.selectedBy) return
+                if(layer.id === message.data.LayerId) layer.selectedBy = ws.user.userName
+            })
+            //canvasStateMap.set(ws.board.boardId!,updatedState!)
+            console.log(canvasStateMap.get(ws.board.boardId!))
+
+            roomsMap.get(ws.board.boardId!)?.forEach((client) => {
+                client.send(wssMessage(wssMessageType.server_updatedCanvasState, {
+                    state: canvasStateMap.get(ws.board.boardId!)
+                }))
+            })
+
+            break;
+
+
+        }
+
         default:
             break;
     }

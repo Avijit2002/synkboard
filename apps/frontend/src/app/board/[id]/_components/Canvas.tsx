@@ -162,6 +162,20 @@ const Canvas = ({ boardId }: Props) => {
     });
   };
 
+  const handleOnLayerPointerDown = (
+    e: PointerEvent<SVGRectElement>,
+    layerId: string
+  ) => {
+    console.log(e);
+    if (ws && ws.readyState === ws.OPEN) {
+      ws.send(
+        wssMessage(wssMessageType.client_canvasLayerSelect, {
+          LayerId: layerId,
+        })
+      );
+    }
+  };
+
   if (!(ws && isLoaded)) {
     return <Loader />;
   }
@@ -195,7 +209,7 @@ const Canvas = ({ boardId }: Props) => {
                 <CanvasLayer
                   layer={l}
                   key={l.id}
-                  //onLayerPointerDown={onLayerPointerDown}
+                  onLayerPointerDown={handleOnLayerPointerDown}
                   //onLayerPointerUp={onLayerPointerUp}
                   selectionColor={null}
                 />
