@@ -49,7 +49,7 @@ const Canvas = ({ boardId }: Props) => {
 
   const { ws } = useWebSocket(boardId);
 
-  const { isLoaded, canvasState, dispatch, canvasLayers,color } = useBoard()!;
+  const { isLoaded, canvasState, dispatch, canvasLayers, color } = useBoard()!;
 
   //console.log(canvasLayers);
 
@@ -130,7 +130,7 @@ const Canvas = ({ boardId }: Props) => {
       y: y,
       height: 100,
       width: 100,
-      fill: hex2rgb(color)
+      fill: hex2rgb(color),
     };
 
     console.log(newLayer);
@@ -153,6 +153,13 @@ const Canvas = ({ boardId }: Props) => {
           canUndo: true,
         };
       });
+
+    dispatch({
+      type: "canvasStateUpdate",
+      payload: {
+        mode: CanvasMode.None,
+      },
+    });
   };
 
   if (!(ws && isLoaded)) {
@@ -166,9 +173,8 @@ const Canvas = ({ boardId }: Props) => {
       <Toolbar
         canRdeo={canUndoRedo.canRedo}
         canUndo={canUndoRedo.canUndo}
-         redo={() => redoHandler(ws, setCanUndoRedo)} // TODO
-         undo={() => undoHandler(ws, setCanUndoRedo)} // TODO
-
+        redo={() => redoHandler(ws, setCanUndoRedo)} // TODO
+        undo={() => undoHandler(ws, setCanUndoRedo)} // TODO
       />
       <svg
         className="h-screen w-screen"
